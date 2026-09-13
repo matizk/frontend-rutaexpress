@@ -1,0 +1,17 @@
+# Angular / Node
+node_modules/
+dist/
+.angular/
+coverage/
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+.DS_Store
+
+# Local configuration and secrets
+.env
+.env.*
+!*.example
