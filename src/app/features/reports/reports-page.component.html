@@ -1,0 +1,26 @@
+<section class="reports-page">
+  <header class="reports-header">
+    <div><p class="eyebrow">VISIÓN OPERACIONAL</p><h1>Reporte de envíos</h1><p>Indicadores calculados en tiempo real desde la operación de RutaExpress.</p></div>
+    <label>Periodo<select [value]="selectedRange()" (change)="changeRange($any($event.target).value)"><option value="last24h">Últimas 24 horas</option><option value="last7d">Últimos 7 días</option><option value="last30d">Últimos 30 días</option></select></label>
+  </header>
+
+  @if (loading()) { <p class="state">Actualizando indicadores…</p> }
+  @if (error()) { <p class="notice">{{ error() }}</p> }
+  @if (kpis(); as report) {
+    <div class="kpi-grid">
+      <article><span>Total de envíos</span><strong>{{ report.totalShipments }}</strong><small>{{ selectedRange() === 'last24h' ? 'Últimas 24 h' : selectedRange() === 'last7d' ? 'Últimos 7 días' : 'Últimos 30 días' }}</small></article>
+      <article><span>En operación</span><strong>{{ report.activeShipments }}</strong><small>Estados activos</small></article>
+      <article><span>Entregados</span><strong>{{ report.deliveredShipments }}</strong><small>Flujo finalizado</small></article>
+      <article><span>Lead time promedio</span><strong>{{ report.averageDeliveredLeadTimeHours === null ? '—' : (report.averageDeliveredLeadTimeHours | number:'1.0-1') + ' h' }}</strong><small>Solo entregados</small></article>
+    </div>
+
+    <div class="report-grid">
+      <article class="panel status-panel"><div class="panel-heading"><div><h2>Estado de la operación</h2><p>Distribución de los envíos consultados.</p></div><span class="cancelled">{{ report.cancelledShipments }} cancelados</span></div>
+        <div class="status-list"><div><span>Creado</span><strong>{{ statusCount('CREADO') }}</strong></div><div><span>Aceptado</span><strong>{{ statusCount('ACEPTADO') }}</strong></div><div><span>En bodega</span><strong>{{ statusCount('EN_BODEGA') }}</strong></div><div><span>En ruta</span><strong>{{ statusCount('EN_RUTA') }}</strong></div><div><span>Entregado</span><strong>{{ statusCount('ENTREGADO') }}</strong></div></div>
+      </article>
+      <article class="panel"><div class="panel-heading"><div><h2>Destinos con mayor actividad</h2><p>Top 5 según envíos creados.</p></div></div>
+        @if (destinations()?.destinations?.length) { <ol class="destination-list">@for (destination of destinations()!.destinations; track destination.destination; let index = $index) { <li><span class="rank">0{{ index + 1 }}</span><span class="place">{{ destination.destination }}</span><strong>{{ destination.shipments }}</strong></li> }</ol> } @else { <p class="empty">No existen destinos en el periodo seleccionado.</p> }
+      </article>
+    </div>
+  }
+</section>
