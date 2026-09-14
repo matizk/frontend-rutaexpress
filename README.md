@@ -45,9 +45,13 @@ docker build -t rutaexpress-frontend:local .
 docker run --rm -p 4200:80 rutaexpress-frontend:local
 ```
 
-## Seguridad
+## Seguridad: Microsoft Entra ID
 
-El flujo final será Microsoft Entra ID + MSAL en Angular. Mientras se configura el tenant académico, existe un acceso de demostración local únicamente para recorrer la interfaz. No otorga acceso al backend: el BFF sigue siendo el límite de seguridad y exige JWT válido con rol `Admin`.
+El frontend usa MSAL para una SPA y solicita un **access token** destinado al BFF. El token se adjunta automáticamente sólo a las llamadas `/api/*`; el navegador nunca se conecta directo a los microservicios.
+
+La configuración está en `src/app/core/auth/entra.config.ts`. Los identificadores de aplicación y tenant son públicos en una SPA, pero no deben confundirse con secretos: **no se crea ni se guarda un client secret en Angular**. La guía completa está en `docs/ENTRA_ID_SETUP.md`.
+
+El BFF es el límite de seguridad final: valida firma, emisor, audiencia y el rol `Admin`. Sin esos elementos, rechaza la operación aunque el frontend se haya renderizado correctamente.
 
 ## Estado
 
