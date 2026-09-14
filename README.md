@@ -35,6 +35,10 @@ npm run build
 npm test -- --watch=false
 ```
 
+La migración a Cognito se validó con 4 pruebas automatizadas: creación del shell,
+renderizado principal, envío del access token sólo a `/api/` y prevención de fuga
+del token hacia direcciones externas.
+
 ## Docker
 
 La imagen compila Angular y publica los archivos estáticos con Nginx. También
@@ -45,14 +49,32 @@ docker build -t rutaexpress-frontend:local .
 docker run --rm -p 4200:80 rutaexpress-frontend:local
 ```
 
-## Seguridad: Microsoft Entra ID
+## Seguridad: AWS Cognito
 
-El frontend usa MSAL para una SPA y solicita un **access token** destinado al BFF. El token se adjunta automáticamente sólo a las llamadas `/api/*`; el navegador nunca se conecta directo a los microservicios.
+El frontend usa la biblioteca oficial AWS Amplify con el Managed Login de Cognito.
+Solicita un **access token** mediante Authorization Code con PKCE y lo adjunta
+automáticamente sólo a las llamadas `/api/*`; el navegador nunca se conecta
+directamente a los microservicios.
 
-La configuración está en `src/app/core/auth/entra.config.ts`. Los identificadores de aplicación y tenant son públicos en una SPA, pero no deben confundirse con secretos: **no se crea ni se guarda un client secret en Angular**. La guía completa está en `docs/ENTRA_ID_SETUP.md`.
+La configuración está en `src/app/core/auth/cognito.config.ts`. El User Pool ID,
+App Client ID y dominio son identificadores públicos, pero **no se crea ni se
+guarda un client secret en Angular**. Los tokens se guardan en `sessionStorage`,
+por lo que se eliminan al cerrar la pestaña. La guía completa está en
+`docs/COGNITO_SETUP.md`.
 
-El BFF es el límite de seguridad final: valida firma, emisor, audiencia y el rol `Admin`. Sin esos elementos, rechaza la operación aunque el frontend se haya renderizado correctamente.
+El guard de Angular exige el grupo exacto `Admin` para la experiencia visual. El
+BFF es el límite de seguridad final: valida firma, emisor, App Client,
+`token_use=access`, vigencia y grupo `Admin`. Sin esos elementos rechaza la
+operación aunque alguien manipule el frontend.
 
 ## Estado
 
-La rama `matizk` contiene la primera vertical del frontend: interfaz responsive, navegación, guard, formularios reactivos, cliente HTTP de envíos y proxy hacia el BFF.
+La rama `matizk` contiene la primera vertical del frontend: interfaz responsive,
+navegación, autenticación Cognito, guard administrativo, formularios reactivos,
+cliente HTTP de envíos y proxy hacia el BFF. Para probar el login real faltan los
+identificadores del User Pool que entregará el responsable AWS.
+
+## Referencias
+
+- [AWS: uso de PKCE con Cognito](https://docs.aws.amazon.com/cognito/latest/developerguide/using-pkce-in-authorization-code.html)
+- [AWS Amplify: administrar tokens y sessionStorage](https://docs.amplify.aws/angular/build-a-backend/auth/connect-your-frontend/manage-user-sessions/)

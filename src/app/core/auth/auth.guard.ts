@@ -1,13 +1,13 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { MsalGuard } from '@azure/msal-angular';
 import { AuthSessionService } from './auth-session.service';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = async () => {
   const session = inject(AuthSessionService);
-  if (!session.isConfigured()) {
-    return inject(Router).createUrlTree(['/login']);
-  }
+  const router = inject(Router);
+  await session.initialize();
 
-  return inject(MsalGuard).canActivate(route, state);
+  if (session.isAuthenticated() && session.isAdmin()) return true;
+  if (session.isAuthenticated()) session.showAdminRequired();
+  return router.createUrlTree(['/login']);
 };
