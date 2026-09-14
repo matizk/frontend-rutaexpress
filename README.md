@@ -35,6 +35,16 @@ npm run build
 npm test -- --watch=false
 ```
 
+## Docker
+
+La imagen compila Angular y publica los archivos estáticos con Nginx. También
+incluye `GET /health`, útil para una comprobación simple en Docker o AWS.
+
+```powershell
+docker build -t rutaexpress-frontend:local .
+docker run --rm -p 4200:80 rutaexpress-frontend:local
+```
+
 ## Seguridad
 
 El flujo final será Microsoft Entra ID + MSAL en Angular. Mientras se configura el tenant académico, existe un acceso de demostración local únicamente para recorrer la interfaz. No otorga acceso al backend: el BFF sigue siendo el límite de seguridad y exige JWT válido con rol `Admin`.
