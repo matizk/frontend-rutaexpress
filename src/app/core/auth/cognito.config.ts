@@ -6,9 +6,9 @@ const PENDING: string = 'REPLACE_ME';
 
 /** Identificadores públicos de Cognito. Una SPA nunca debe tener client secret. */
 export const cognitoConfig = {
-  userPoolId: PENDING,
-  userPoolClientId: PENDING,
-  domain: PENDING,
+  userPoolId: 'us-east-1_omx1k5hul',
+  userPoolClientId: '41v988atubk0lrcmto285tk77i',
+  domain: 'us-east-1omx1k5hui.auth.us-east-1.amazoncognito.com',
   redirectSignIn: 'http://localhost:4200/',
   redirectSignOut: 'http://localhost:4200/',
 } as const;
@@ -28,7 +28,8 @@ export function configureCognito(): void {
         loginWith: {
           oauth: {
             domain: cognitoConfig.domain,
-            scopes: ['openid', 'email', 'profile'],
+            // El nombre visible usa el claim email; profile no es necesario para la SPA.
+            scopes: ['openid', 'email'],
             redirectSignIn: [cognitoConfig.redirectSignIn],
             redirectSignOut: [cognitoConfig.redirectSignOut],
             responseType: 'code',
