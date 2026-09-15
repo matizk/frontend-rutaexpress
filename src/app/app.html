@@ -1,6 +1,6 @@
 <header class="topbar">
   <a class="brand" routerLink="/" aria-label="RutaExpress inicio"><span class="brand-mark">R</span><span>Ruta<span>Express</span></span></a>
-  <nav aria-label="Navegación principal"><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a><a routerLink="/admin" routerLinkActive="active">Operación</a><a routerLink="/reportes" routerLinkActive="active">Reportes</a></nav>
+  <nav aria-label="Navegación principal"><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a><a routerLink="/admin" routerLinkActive="active">Operación</a><a routerLink="/catalogo" routerLinkActive="active">Catálogo</a><a routerLink="/reportes" routerLinkActive="active">Reportes</a></nav>
   @if (session.isAuthenticated()) { <button class="user-chip" type="button" (click)="session.signOut()">{{ session.displayName() }} <span>Salir</span></button> } @else { <a class="login-link" routerLink="/login">Iniciar sesión</a> }
 </header>
 <main><router-outlet /></main>

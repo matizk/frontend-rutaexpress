@@ -1,0 +1,51 @@
+<section class="catalog-header">
+  <div>
+    <p class="eyebrow">CONFIGURACIÓN COMERCIAL</p>
+    <h1>Catálogo de servicios</h1>
+    <p>Administra tarifas y capacidad disponible a través del BFF.</p>
+  </div>
+  <button type="button" (click)="load()">Actualizar datos</button>
+</section>
+
+@if (error()) { <p class="notice" role="alert">{{ error() }}</p> }
+
+<section class="catalog-grid">
+  <form class="service-form" [formGroup]="form" (ngSubmit)="save()">
+    <div class="form-heading">
+      <h2>{{ editingId() === null ? 'Nuevo servicio' : 'Editar servicio' }}</h2>
+      @if (editingId() !== null) { <button class="text-button" type="button" (click)="cancelEdit()">Cancelar</button> }
+    </div>
+    <label>Nombre<input formControlName="nombre" placeholder="Ej. Express" /></label>
+    <label>Descripción<textarea formControlName="descripcion" rows="3" placeholder="Detalle del servicio"></textarea></label>
+    <div class="form-row">
+      <label>Tarifa (CLP)<input formControlName="precio" type="number" min="0" step="1" /></label>
+      <label>Capacidad<input formControlName="cantidadDisponible" type="number" min="0" step="1" /></label>
+    </div>
+    <button class="primary" type="submit">{{ editingId() === null ? 'Crear servicio' : 'Guardar cambios' }}</button>
+  </form>
+
+  <section class="services-card">
+    <div class="card-heading"><div><h2>Servicios disponibles</h2><span>{{ services().length }} registros</span></div></div>
+    @if (loading()) {
+      <p class="empty">Consultando BFF…</p>
+    } @else if (!services().length) {
+      <p class="empty">Aún no hay servicios cargados.</p>
+    } @else {
+      <div class="service-list">
+        @for (service of services(); track service.id) {
+          <article class="service-row">
+            <div class="service-detail">
+              <strong>{{ service.nombre }}</strong>
+              <span>{{ service.descripcion || 'Sin descripción' }}</span>
+            </div>
+            <div class="service-metrics">
+              <span>{{ service.precio | currency:'CLP':'symbol-narrow':'1.0-0' }}</span>
+              <small>{{ service.cantidadDisponible }} cupos</small>
+            </div>
+            <button class="edit-button" type="button" (click)="edit(service)">Editar</button>
+          </article>
+        }
+      </div>
+    }
+  </section>
+</section>
