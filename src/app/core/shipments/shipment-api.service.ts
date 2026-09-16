@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 export type ShipmentStatus = 'CREADO' | 'ACEPTADO' | 'EN_BODEGA' | 'EN_RUTA' | 'ENTREGADO' | 'CANCELADO';
 
 export interface Shipment { id: number; codigoSeguimiento: string; nombreDestinatario: string; emailDestinatario: string; direccionOrigen: string; direccionDestino: string; pesoKg: number; servicioId: number | null; servicioNombre: string | null; estado: ShipmentStatus; fechaCreacion: string; fechaActualizacion: string; }
+export interface PublicTrackingResponse { codigoSeguimiento: string; estado: ShipmentStatus; direccionOrigen: string; direccionDestino: string; fechaActualizacion: string; }
 export interface CreateShipmentRequest { codigoSeguimiento: string; nombreDestinatario: string; emailDestinatario: string; direccionOrigen: string; direccionDestino: string; pesoKg: number; servicioId: number; }
 
 @Injectable({ providedIn: 'root' })
@@ -12,6 +13,7 @@ export class ShipmentApiService {
   private readonly endpoint = '/api/shipments';
   constructor(private readonly http: HttpClient) {}
   list(): Observable<Shipment[]> { return this.http.get<Shipment[]>(this.endpoint); }
+  track(code: string): Observable<PublicTrackingResponse> { return this.http.get<PublicTrackingResponse>(`${this.endpoint}/track/${encodeURIComponent(code)}`); }
   create(request: CreateShipmentRequest): Observable<Shipment> { return this.http.post<Shipment>(this.endpoint, request); }
   updateStatus(id: number, estado: ShipmentStatus): Observable<Shipment> { return this.http.put<Shipment>(`${this.endpoint}/${id}/status`, { estado }); }
 }
