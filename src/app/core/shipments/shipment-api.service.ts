@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 export type ShipmentStatus = 'CREADO' | 'ACEPTADO' | 'EN_BODEGA' | 'EN_RUTA' | 'ENTREGADO' | 'CANCELADO';
 
 export interface Shipment { id: number; codigoSeguimiento: string; nombreDestinatario: string; emailDestinatario: string; direccionOrigen: string; direccionDestino: string; pesoKg: number; servicioId: number | null; servicioNombre: string | null; estado: ShipmentStatus; fechaCreacion: string; fechaActualizacion: string; }
-export interface CreateShipmentRequest { nombreDestinatario: string; emailDestinatario: string; direccionOrigen: string; direccionDestino: string; pesoKg: number; servicioId: number; }
+export interface CreateShipmentRequest { codigoSeguimiento: string; nombreDestinatario: string; emailDestinatario: string; direccionOrigen: string; direccionDestino: string; pesoKg: number; servicioId: number; }
 
 @Injectable({ providedIn: 'root' })
 export class ShipmentApiService {
