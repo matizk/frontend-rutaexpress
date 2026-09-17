@@ -106,6 +106,9 @@ Abrir `http://localhost:4200/`. Usar `localhost`, no `127.0.0.1`, por la configu
 5. En la portada consultar ese código sin iniciar sesión.
 6. En Reportes mostrar los KPI y destinos.
 
+7. En la base `shipments_db` ejecutar `database/02-create-users.sql` y registrar el
+   `cognito_sub` real del usuario de Cognito, junto con su rol. Nunca guardar su contraseña.
+
 El tracking público solo entrega código, estado, origen, destino y última actualización. No entrega nombre ni correo.
 
 También existe `compose.stack.yml` en el repositorio de Envíos para levantar
