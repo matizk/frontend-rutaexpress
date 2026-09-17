@@ -148,3 +148,26 @@ docker build -t rutaexpress-report:local .\ms-rutaexpress-report
 ```
 
 El siguiente paso cloud es etiquetar estas imágenes con el URI de ECR y hacer `docker push` usando credenciales IAM del encargado AWS.
+
+## Valores actuales de Cognito
+
+Estos identificadores no son contraseñas ni secretos, pero deben coincidir entre el frontend, el BFF y la configuración de AWS:
+
+```text
+User Pool ID: us-east-1_omx1k5huI
+App Client ID: 41v988atubk0lrcmto285tk77i
+Issuer: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_omx1k5huI
+Dominio Hosted UI: https://us-east-1omx1k5hui.auth.us-east-1.amazoncognito.com
+Grupo requerido: Admin
+Callback local: http://localhost:4200/
+``` 
+
+## Comprobaciones y problemas habituales
+
+- Ejecutar `docker compose -f compose.stack.yml config --quiet` antes de levantar el stack. Si aparecen advertencias de Cognito, revisar que `.env` tenga `COGNITO_ISSUER_URI` y `COGNITO_CLIENT_ID`.
+- Si un puerto está ocupado, no iniciar una segunda copia del servicio. Cerrar únicamente el proceso propio que lo esté usando y volver a ejecutar.
+- Si el login vuelve a `localhost` con error, comprobar que la URL de retorno del App Client sea exactamente `http://localhost:4200/` y abrir la aplicación con `localhost`, no con `127.0.0.1`.
+- Si el BFF devuelve `401`, revisar que el usuario pertenezca al grupo exacto `Admin`, que el token sea nuevo y que el `COGNITO_ISSUER_URI` corresponda al mismo User Pool.
+- Si el tracking devuelve `404`, verificar que se esté usando el código generado al crear el envío; la consulta pública no requiere iniciar sesión.
+- El primer arranque de Oracle puede tardar. Esperar a que el contenedor esté saludable antes de iniciar Catálogo y Envíos.
+- Si se usa `compose.stack.yml`, ejecutarlo desde `ms-rutaexpress-shipments`; las cinco carpetas deben estar al mismo nivel y no se deben cambiar los nombres de las carpetas.
