@@ -110,6 +110,9 @@ Abrir `http://localhost:4200/`. Usar `localhost`, no `127.0.0.1`, por la configu
    Usuarios. Después del primer login se debe registrar el `cognito_sub` real junto con
    el rol; nunca guardar la contraseña.
 
+El registro se realiza mediante `POST /api/users` con el access token de un usuario
+`Admin` y los campos `cognitoSub`, `email`, `rut`, `nombre`, `apellido` y `rol`.
+
 El tracking público solo entrega código, estado, origen, destino y última actualización. No entrega nombre ni correo.
 
 También existe `compose.stack.yml` en el repositorio de Envíos para levantar
