@@ -103,7 +103,7 @@ Abrir `http://localhost:4200/`. Usar `localhost`, no `127.0.0.1`, por la configu
 El tracking público solo entrega código, estado, origen, destino y última actualización. No entrega nombre ni correo.
 
 También existe `compose.stack.yml` en el repositorio de Envíos para levantar
-Oracle, Catálogo, Envíos, Reportes y BFF juntos. Requiere que los cinco repositorios
+Oracle, Catálogo, Envíos, Reportes, BFF y frontend juntos. Requiere que los cinco repositorios
 sean carpetas hermanas y que el `.env` tenga las variables de Oracle y Cognito.
 
 ## Pendiente para terminar AWS
