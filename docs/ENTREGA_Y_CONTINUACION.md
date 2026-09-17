@@ -106,6 +106,7 @@ También existe `compose.stack.yml` en el repositorio de Envíos para levantar
 Oracle, Catálogo, Envíos, Reportes, BFF y frontend juntos. Requiere que los cinco repositorios
 sean carpetas hermanas y que el `.env` tenga las variables de Oracle y Cognito.
 En ese modo, Nginx sirve Angular en el puerto 4200 y reenvía `/api` al servicio `bff`.
+Compose también espera los healthchecks de Actuator antes de iniciar los servicios dependientes.
 
 ## Pendiente para terminar AWS
 
