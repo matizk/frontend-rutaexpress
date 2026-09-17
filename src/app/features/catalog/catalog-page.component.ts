@@ -38,7 +38,7 @@ export class CatalogPageComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.error.set('No se pudo cargar el catálogo. Inicia Oracle, Catálogo y el BFF.');
+        this.error.set('No se pudo cargar el catálogo. Inicia PostgreSQL, Catálogo y el BFF.');
         this.loading.set(false);
       },
     });

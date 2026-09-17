@@ -12,13 +12,13 @@ Repositorios:
 - Envíos: `https://github.com/matizk/ms-rutaexpress-shipments.git`
 - Reportes: `https://github.com/matizk/ms-rutaexpress-report.git`
 
-La solución ya tiene Cognito con grupo `Admin`, BFF con validación JWT, Catálogo, Envíos, Reportes, descuento de cupos, tracking público por código, Oracle en Docker, pruebas y documentación.
+La solución ya tiene Cognito con grupo `Admin`, BFF con validación JWT, Catálogo, Envíos, Reportes, descuento de cupos, tracking público por código, PostgreSQL por servicio en Docker, pruebas y documentación.
 
 ## Arquitectura y puertos
 
 ```text
-Angular 4200 -> BFF 8080 -> Catálogo 8081 -> Oracle
-                         -> Envíos 5000 -> Oracle
+Angular 4200 -> BFF 8080 -> Catálogo 8081 -> catalog_db (PostgreSQL)
+                         -> Envíos 5000 -> shipments_db (PostgreSQL)
                          -> Reportes 8082 -> Envíos
 Tracking público: Angular -> BFF -> Envíos
 ```
@@ -44,19 +44,25 @@ Requisitos: Git, Node.js LTS, JDK 21 y Docker Desktop.
 1. En `ms-rutaexpress-shipments`, copiar `.env.example` a `.env`, completar las contraseñas locales y ejecutar:
 
 ```powershell
-docker compose -f compose.local.yml up -d oracle
+docker compose -f compose.local.yml up -d shipments-db
 ```
 
-2. En Catálogo, con Oracle saludable:
+2. En Catálogo, con PostgreSQL saludable:
 
 ```powershell
-$env:SPRING_DATASOURCE_URL = 'jdbc:oracle:thin:@//localhost:1521/FREEPDB1'
-$env:SPRING_DATASOURCE_USERNAME = 'RUTAEXPRESS'
-$env:SPRING_DATASOURCE_PASSWORD = '<APP_USER_PASSWORD_LOCAL>'
+$env:SPRING_DATASOURCE_URL = 'jdbc:postgresql://localhost:5432/catalog_db'
+$env:SPRING_DATASOURCE_USERNAME = 'rutaexpress'
+$env:SPRING_DATASOURCE_PASSWORD = '<CATALOG_DB_PASSWORD_LOCAL>'
 .\mvnw.cmd spring-boot:run
 ```
 
 3. En Envíos, usar las mismas variables y agregar:
+
+```powershell
+$env:SPRING_DATASOURCE_URL = 'jdbc:postgresql://localhost:5433/shipments_db'
+$env:SPRING_DATASOURCE_USERNAME = 'rutaexpress'
+$env:SPRING_DATASOURCE_PASSWORD = '<SHIPMENTS_DB_PASSWORD_LOCAL>'
+```
 
 ```powershell
 $env:CATALOGO_URL = 'http://localhost:8081'
@@ -103,14 +109,14 @@ Abrir `http://localhost:4200/`. Usar `localhost`, no `127.0.0.1`, por la configu
 El tracking público solo entrega código, estado, origen, destino y última actualización. No entrega nombre ni correo.
 
 También existe `compose.stack.yml` en el repositorio de Envíos para levantar
-Oracle, Catálogo, Envíos, Reportes, BFF y frontend juntos. Requiere que los cinco repositorios
-sean carpetas hermanas y que el `.env` tenga las variables de Oracle y Cognito.
+PostgreSQL, Catálogo, Envíos, Reportes, BFF y frontend juntos. Requiere que los cinco repositorios
+sean carpetas hermanas y que el `.env` tenga las variables de PostgreSQL y Cognito.
 En ese modo, Nginx sirve Angular en el puerto 4200 y reenvía `/api` al servicio `bff`.
 Compose también espera los healthchecks de Actuator antes de iniciar los servicios dependientes.
 
 ## Pendiente para terminar AWS
 
-- Definir con la profesora si se usará RDS PostgreSQL u Oracle; localmente se usa Oracle.
+- Crear/configurar PostgreSQL administrado en AWS, manteniendo una base separada por microservicio.
 - Crear la base cloud, IAM, grupos de seguridad y variables de entorno.
 - Publicar las imágenes Docker en ECR o desplegar JAR en EC2/Elastic Beanstalk.
 - Desplegar Catálogo, Envíos, Reportes y BFF con comunicación interna.
@@ -171,5 +177,5 @@ Callback local: http://localhost:4200/
 - Si el login vuelve a `localhost` con error, comprobar que la URL de retorno del App Client sea exactamente `http://localhost:4200/` y abrir la aplicación con `localhost`, no con `127.0.0.1`.
 - Si el BFF devuelve `401`, revisar que el usuario pertenezca al grupo exacto `Admin`, que el token sea nuevo y que el `COGNITO_ISSUER_URI` corresponda al mismo User Pool.
 - Si el tracking devuelve `404`, verificar que se esté usando el código generado al crear el envío; la consulta pública no requiere iniciar sesión.
-- El primer arranque de Oracle puede tardar. Esperar a que el contenedor esté saludable antes de iniciar Catálogo y Envíos.
+- El primer arranque de PostgreSQL puede tardar. Esperar a que los contenedores estén saludables antes de iniciar Catálogo y Envíos.
 - Si se usa `compose.stack.yml`, ejecutarlo desde `ms-rutaexpress-shipments`; las cinco carpetas deben estar al mismo nivel y no se deben cambiar los nombres de las carpetas.

@@ -14,7 +14,7 @@ Frontend Angular de RutaExpress para DSY1107 – Desarrollo Cloud Native.
 ## Arquitectura
 
 ```text
-Angular -> AWS API Gateway -> BFF -> ms-rutaexpress-catalog / ms-rutaexpress-shipments -> Oracle
+Angular -> AWS API Gateway -> BFF -> Catálogo / Envíos -> PostgreSQL por servicio
 ```
 
 Durante desarrollo `proxy.conf.json` redirige `/api` a `http://localhost:8080`, donde debe ejecutarse el BFF. En AWS esa misma ruta será atendida por API Gateway.

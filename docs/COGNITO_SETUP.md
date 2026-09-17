@@ -42,7 +42,7 @@ pero la autorización definitiva siempre la realiza el BFF.
 
 ## Prueba integral
 
-1. Inicia Oracle, catalog, shipments y BFF.
+1. Inicia PostgreSQL, catalog, shipments y BFF.
 2. Ejecuta `npm start` y abre `http://localhost:4200/`.
 3. Inicia sesión con un usuario del grupo `Admin`.
 4. Comprueba que `/admin` lista y crea envíos.
