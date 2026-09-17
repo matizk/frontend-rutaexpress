@@ -73,6 +73,28 @@ export class AuthSessionService {
     }
   }
 
+  async applicationUserProfile(): Promise<{
+    cognitoSub: string; email: string; rut: string | null; nombre: string; apellido: string; rol: 'Admin'
+  } | null> {
+    try {
+      const session = await fetchAuthSession();
+      const payload = session.tokens?.idToken?.payload;
+      const cognitoSub = this.textClaim(payload?.['sub']);
+      const email = this.textClaim(payload?.['email']);
+      if (!cognitoSub || !email) return null;
+      return {
+        cognitoSub,
+        email,
+        rut: this.textClaim(payload?.['custom:rut']),
+        nombre: this.textClaim(payload?.['given_name']) ?? email.split('@')[0],
+        apellido: this.textClaim(payload?.['family_name']) ?? 'Sin apellido',
+        rol: 'Admin',
+      };
+    } catch {
+      return null;
+    }
+  }
+
   showAdminRequired(): void {
     this.configurationError.set('Tu sesión es válida, pero necesitas pertenecer al grupo Admin de Cognito.');
   }

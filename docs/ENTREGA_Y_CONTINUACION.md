@@ -107,8 +107,8 @@ Abrir `http://localhost:4200/`. Usar `localhost`, no `127.0.0.1`, por la configu
 6. En Reportes mostrar los KPI y destinos.
 
 7. En un volumen PostgreSQL nuevo, Compose crea automáticamente las tablas de Envíos y
-   Usuarios. Después del primer login se debe registrar el `cognito_sub` real junto con
-   el rol; nunca guardar la contraseña.
+   Usuarios. Al entrar al panel Admin, el frontend sincroniza el `cognito_sub` real,
+   correo, nombre y rol; nunca guarda la contraseña.
 
 El registro se realiza mediante `POST /api/users` con el access token de un usuario
 `Admin` y los campos `cognitoSub`, `email`, `rut`, `nombre`, `apellido` y `rol`.
