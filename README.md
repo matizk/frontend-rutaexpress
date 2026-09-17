@@ -5,8 +5,10 @@ Frontend Angular de RutaExpress para DSY1107 – Desarrollo Cloud Native.
 ## Qué resuelve
 
 - Inicio público y vista de trazabilidad.
+- Consulta pública de tracking por código, sin exponer datos personales.
 - Pantalla de acceso y ruta administrativa protegida por un guard de Angular.
 - Panel para crear envíos y actualizar su estado.
+- Panel de Catálogo para administrar tarifas y cupos disponibles.
 - Integración exclusivamente por `/api` hacia el BFF; el navegador no debe llamar directamente a los microservicios de catálogo o envíos.
 
 ## Arquitectura
@@ -35,9 +37,9 @@ npm run build
 npm test -- --watch=false
 ```
 
-La migración a Cognito se validó con 4 pruebas automatizadas: creación del shell,
-renderizado principal, envío del access token sólo a `/api/` y prevención de fuga
-del token hacia direcciones externas.
+La integración se valida con 6 pruebas automatizadas del frontend. El tracking
+público consume `/api/shipments/track/{codigo}` y las operaciones administrativas
+usan el access token sólo en rutas `/api/` protegidas.
 
 ## Docker
 
@@ -69,10 +71,9 @@ operación aunque alguien manipule el frontend.
 
 ## Estado
 
-La rama `matizk` contiene la primera vertical del frontend: interfaz responsive,
-navegación, autenticación Cognito, guard administrativo, formularios reactivos,
-cliente HTTP de envíos y proxy hacia el BFF. Para probar el login real faltan los
-identificadores del User Pool que entregará el responsable AWS.
+La rama `matizk` contiene la vertical funcional de la entrega: interfaz responsive,
+autenticación Cognito, guard administrativo, tracking público, formularios de
+envíos, selector de servicios del Catálogo, reportes y proxy hacia el BFF.
 
 ## Referencias
 
