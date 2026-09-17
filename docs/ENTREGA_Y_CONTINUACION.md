@@ -120,3 +120,27 @@ El tracking público solo entrega código, estado, origen, destino y última act
 - Encargado integración: URLs cloud, CORS, pruebas, capturas y Pull Request a `main`.
 
 Nunca subir `.env`, contraseñas, tokens, client secrets ni códigos de verificación.
+
+## Estado de imágenes Docker
+
+Las cinco imágenes se construyeron correctamente en el equipo local con estos nombres:
+
+```text
+rutaexpress-frontend:local
+rutaexpress-bff:local
+rutaexpress-catalog:local
+rutaexpress-shipments:local
+rutaexpress-report:local
+```
+
+Para reconstruirlas desde la carpeta que contiene los cinco repositorios:
+
+```powershell
+docker build -t rutaexpress-frontend:local .\frontend-rutaexpress
+docker build -t rutaexpress-bff:local .\ms-rutaexpress-bff
+docker build -t rutaexpress-catalog:local .\ms-rutaexpress-catalog
+docker build -t rutaexpress-shipments:local .\ms-rutaexpress-shipments
+docker build -t rutaexpress-report:local .\ms-rutaexpress-report
+```
+
+El siguiente paso cloud es etiquetar estas imágenes con el URI de ECR y hacer `docker push` usando credenciales IAM del encargado AWS.
