@@ -2,7 +2,8 @@
 
 ## Estado
 
-La rama de trabajo es `matizk`; `main` no se ha modificado.
+La versión final e integrada de la entrega se encuentra en `main` en los cinco
+repositorios.
 
 Repositorios:
 
@@ -28,14 +29,16 @@ Tracking público: Angular -> BFF -> Envíos
 ```powershell
 mkdir rutaexpress
 cd rutaexpress
-git clone -b matizk https://github.com/matizk/frontend-rutaexpress.git
-git clone -b matizk https://github.com/matizk/ms-rutaexpress-bff.git
-git clone -b matizk https://github.com/matizk/ms-rutaexpress-catalog.git
-git clone -b matizk https://github.com/matizk/ms-rutaexpress-shipments.git
-git clone -b matizk https://github.com/matizk/ms-rutaexpress-report.git
+git clone https://github.com/matizk/frontend-rutaexpress.git
+git clone https://github.com/matizk/ms-rutaexpress-bff.git
+git clone https://github.com/matizk/ms-rutaexpress-catalog.git
+git clone https://github.com/matizk/ms-rutaexpress-shipments.git
+git clone https://github.com/matizk/ms-rutaexpress-report.git
 ```
 
-Cada carpeta es un repositorio independiente. Trabajar siempre en `matizk`, hacer commit y push a `matizk`, y crear la Pull Request hacia `main` solo al final.
+Cada carpeta es un repositorio independiente. Para cambios nuevos, crear una rama
+propia desde `main`, hacer commit y push en esa rama y abrir una Pull Request hacia
+`main`. No versionar trabajo incompleto directamente sobre la rama final.
 
 ## Ejecutar localmente
 
@@ -121,22 +124,30 @@ sean carpetas hermanas y que el `.env` tenga las variables de PostgreSQL y Cogni
 En ese modo, Nginx sirve Angular en el puerto 4200 y reenvía `/api` al servicio `bff`.
 Compose también espera los healthchecks de Actuator antes de iniciar los servicios dependientes.
 
-## Pendiente para terminar AWS
+## Despliegue AWS implementado
 
-- Crear/configurar PostgreSQL administrado en AWS, manteniendo una base separada por microservicio.
-- Crear la base cloud, IAM, grupos de seguridad y variables de entorno.
-- Publicar las imágenes Docker en ECR o desplegar JAR en EC2/Elastic Beanstalk.
-- Desplegar Catálogo, Envíos, Reportes y BFF con comunicación interna.
-- Configurar API Gateway hacia el BFF.
-- Configurar dominio HTTPS, CORS y callbacks HTTPS de Cognito.
-- Probar login Admin, usuario sin Admin, Catálogo, descuento de cupo, tracking y Reportes en AWS.
-- Tomar capturas sin mostrar tokens, contraseñas ni códigos de correo.
+- La instancia EC2 ejecuta Frontend, BFF, Catálogo, Envíos, Reportes y dos bases
+  PostgreSQL mediante Docker Compose.
+- Catálogo y Envíos mantienen persistencia separada, aunque ambas bases se ejecutan
+  en la misma instancia para optimizar recursos de la entrega.
+- API Gateway publica la ruta `ANY /api/{proxy+}`, la integra con el BFF y aplica
+  CORS y un JWT Authorizer.
+- Cognito administra el User Pool, App Client, Managed Login, usuarios y grupo
+  `Admin`.
+- Angular está publicado desde EC2 y utiliza API Gateway/BFF para sus solicitudes
+  de negocio.
 
-## Reparto sugerido
+Antes de cada demostración se debe comprobar que la instancia EC2 esté en estado
+`Running`, que `docker compose ps` muestre todos los servicios saludables y que las
+URL de callback, logout y CORS coincidan exactamente con el origen público vigente.
 
-- Encargado Cognito: confirmar User Pool, App Client, dominio, grupo `Admin` y usuarios de prueba.
-- Encargado AWS: RDS, IAM, ECR, EC2/Beanstalk, API Gateway, red y variables.
-- Encargado integración: URLs cloud, CORS, pruebas, capturas y Pull Request a `main`.
+## Revisión antes de entregar
+
+- Confirmar que la profesora tenga acceso como colaboradora a todos los repositorios.
+- Probar login, Catálogo, creación y actualización de Envíos, tracking público y
+  Reportes desde un computador distinto.
+- Guardar capturas de EC2, Docker Compose, API Gateway, Cognito y la aplicación.
+- Verificar que los cambios finales estén fusionados en `main`.
 
 Nunca subir `.env`, contraseñas, tokens, client secrets ni códigos de verificación.
 
@@ -162,7 +173,9 @@ docker build -t rutaexpress-shipments:local .\ms-rutaexpress-shipments
 docker build -t rutaexpress-report:local .\ms-rutaexpress-report
 ```
 
-El siguiente paso cloud es etiquetar estas imágenes con el URI de ECR y hacer `docker push` usando credenciales IAM del encargado AWS.
+Para esta entrega las imágenes se construyen y ejecutan mediante Docker Compose en
+EC2. Publicarlas en ECR puede realizarse como mejora posterior, pero no es necesario
+para reproducir el despliegue actual.
 
 ## Valores actuales de Cognito
 

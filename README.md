@@ -71,9 +71,20 @@ operación aunque alguien manipule el frontend.
 
 ## Estado
 
-La rama `matizk` contiene la vertical funcional de la entrega: interfaz responsive,
-autenticación Cognito, guard administrativo, tracking público, formularios de
+La rama `main` contiene la versión funcional de la entrega: interfaz responsive,
+autenticación con Cognito, guard administrativo, tracking público, formularios de
 envíos, selector de servicios del Catálogo, reportes y proxy hacia el BFF.
+
+## Despliegue AWS
+
+La versión cloud se publica como un contenedor Angular/Nginx en EC2. Las solicitudes
+del navegador usan el prefijo `/api` y pasan por AWS API Gateway antes de llegar al
+BFF; el frontend no consume directamente Catálogo, Envíos ni Reportes.
+
+El inicio de sesión utiliza Cognito Managed Login con Authorization Code y PKCE. Las
+URL de callback y logout deben coincidir exactamente con el origen desde el cual se
+abre la aplicación. Las direcciones públicas de la infraestructura no se fijan en el
+código, para que puedan cambiarse sin recompilar la aplicación.
 
 ## Referencias
 
