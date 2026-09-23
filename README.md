@@ -83,8 +83,9 @@ BFF; el frontend no consume directamente Catálogo, Envíos ni Reportes.
 
 El inicio de sesión utiliza Cognito Managed Login con Authorization Code y PKCE. Las
 URL de callback y logout deben coincidir exactamente con el origen desde el cual se
-abre la aplicación. Las direcciones públicas de la infraestructura no se fijan en el
-código, para que puedan cambiarse sin recompilar la aplicación.
+abre la aplicación. Esta configuración se concentra en
+`src/app/core/auth/cognito.config.ts`; antes de compilar para otro entorno se deben
+ajustar allí los orígenes y registrarlos también en el App Client de Cognito.
 
 ## Referencias
 
