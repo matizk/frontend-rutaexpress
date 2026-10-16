@@ -1,6 +1,6 @@
 # frontend-rutaexpress
 
-> EV2 en revision: rama `codex/feature-ev2-mensajeria`, PR hacia develop. main conserva EV1. Ver [Gitflow](CONTRIBUTING.md). Cloud/login institucional pendientes de verificacion real.
+> Versión de integración EV2: `develop`, mediante el [PR #1](https://github.com/matizk/frontend-rutaexpress/pull/1). `main` conserva EV1 hasta una release validada. Ver [Gitflow](CONTRIBUTING.md). El login institucional y AWS/RDS siguen pendientes de verificación real.
 
 Frontend Angular de RutaExpress para DSY1107 – Desarrollo Cloud Native.
 
@@ -16,7 +16,9 @@ Frontend Angular de RutaExpress para DSY1107 – Desarrollo Cloud Native.
 ## Arquitectura
 
 ```text
-Angular -> AWS API Gateway -> BFF -> Catálogo / Envíos -> PostgreSQL por servicio
+Angular LOCAL -> AWS API Gateway -> BFF -> Catálogo / Envíos / Mensajería / Reportes
+     |                                         |             |
+     +-> Azure: identidad del operador         PostgreSQL    RabbitMQ
 ```
 
 Durante desarrollo `proxy.conf.json` redirige `/api` a `http://localhost:8080`, donde debe ejecutarse el BFF. En AWS esa misma ruta será atendida por API Gateway.
@@ -106,7 +108,7 @@ Angular, CLI y build están fijados en 22.2.3, con package-lock.json regenerado 
 
 La imagen Nginx usa una plantilla con BFF_UPSTREAM, por defecto http://bff:8080. En el stack EV2 se configura mediante FRONTEND_API_UPSTREAM en .env.ev2 o con configurar-api.ps1. Admite un origen HTTPS y stage opcional, conserva /api y su query, usa SNI y valida certificados. El destino debe ser la API oficial del equipo, pues recibirá los bearer tokens. La configuración inválida se rechaza antes de iniciar Nginx.
 
-Guías de ejecución, diagnóstico y demostración: PREPARACION_EQUIPO_EV2.md y DEMOSTRACION_Y_EVIDENCIAS_EV2.md en la carpeta hermana ms-rutaexpress-shipments. El avance EV2 se publica en `codex/feature-ev2-mensajeria`, con PR a `develop`; `main` conserva la entrega anterior hasta aprobar la integración. No clonar main esperando estas funciones. El login Duoc y el despliegue cloud reales siguen pendientes.
+Guías de ejecución, diagnóstico y demostración: PREPARACION_EQUIPO_EV2.md y DEMOSTRACION_Y_EVIDENCIAS_EV2.md en la carpeta hermana ms-rutaexpress-shipments. Descargar `develop` en los seis repositorios para continuar la integración EV2; no clonar `main` esperando estas funciones. Consultar el PR enlazado para comprobar su fusión. El login Duoc y el despliegue cloud reales siguen pendientes.
 
 ## Colaboracion y Gitflow
 
