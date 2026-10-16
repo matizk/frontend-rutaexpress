@@ -1,0 +1,31 @@
+<section class="messaging-panel" aria-labelledby="activity-heading">
+  <div class="heading">
+    <div>
+      <h2 id="activity-heading">Actividad y comprobantes</h2>
+      <p>Los resultados aparecen al terminar el procesamiento de cada envío.</p>
+    </div>
+    @if (updatedAt()) { <small>Última actualización: {{ updatedAt() | date:'HH:mm:ss' }}</small> }
+  </div>
+  @if (error()) { <p class="notice" role="alert">{{ error() }}</p> }
+  <div class="totals">
+    <div><strong>{{ summary().notifications }}</strong><span>Notificaciones internas</span></div>
+    <div><strong>{{ summary().tickets }}</strong><span>Comprobantes generados</span></div>
+    <div><strong>{{ summary().audit }}</strong><span>Eventos registrados</span></div>
+  </div>
+  <label class="search">Buscar entre los últimos 100 registros
+    <input type="search" placeholder="Código de envío, por ejemplo RX-…" [value]="search()" (input)="search.set($any($event.target).value)" />
+  </label>
+  <div class="receipts">
+    @for (receipt of visible(); track receipt.id) {
+      <article>
+        <div><strong>{{ receipt.trackingCode }}</strong><span>{{ labels[receipt.domain] }} · {{ receipt.status }}</span></div>
+        <div class="actions">
+          <small>{{ receipt.processedAt | date:'dd/MM/yyyy HH:mm:ss' }}</small>
+          @if (receipt.domain === 'TICKET') { <button type="button" (click)="download(receipt)">Descargar comprobante</button> }
+        </div>
+      </article>
+    } @empty {
+      <p class="empty">{{ updatedAt() ? 'No hay actividad que coincida. Los nuevos envíos aparecerán aquí al procesarse.' : 'Consultando la actividad…' }}</p>
+    }
+  </div>
+</section>

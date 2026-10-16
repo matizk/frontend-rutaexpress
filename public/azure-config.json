@@ -1,0 +1,8 @@
+{
+  "enabled": false,
+  "tenantId": "",
+  "clientId": "",
+  "apiClientId": "",
+  "scope": "operator.access",
+  "redirectPath": "/auth/azure"
+}

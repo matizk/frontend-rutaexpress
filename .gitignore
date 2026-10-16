@@ -42,3 +42,10 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Configuracion privada local: solo se publican las plantillas .example.
+.env
+.env.*
+!*.example
+*.pem
+*.key
