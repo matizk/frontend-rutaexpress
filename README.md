@@ -1,4 +1,8 @@
-# frontend-rutaexpress
+# interfaz-rutaexpress
+
+> **Estás viendo main: versión estable de EV1.** El avance de EV2 y las instrucciones actuales para descargar las seis carpetas están en [desarrollo](https://github.com/matizk/interfaz-rutaexpress/tree/desarrollo) y en la [guía central del equipo](https://github.com/matizk/ms-rutaexpress-envios/blob/desarrollo/CONTINUAR_EV2_EQUIPO.md). Esta actualización de main solo cambia documentos; no publica la implementación EV2 ni acredita despliegue cloud.
+
+Los repositorios y carpetas se renombraron al español el 17-10-2026. Ver [COLABORACION.md](COLABORACION.md) para el flujo `matizk → desarrollo → entrega → main`. Las instrucciones EV1 que siguen son antecedentes de esta versión, no la configuración del sistema EV2 con los nuevos nombres. Para ejecutar la integración actual, seguir exclusivamente la guía de desarrollo.
 
 Frontend Angular de RutaExpress para DSY1107 – Desarrollo Cloud Native.
 
@@ -62,7 +66,7 @@ La configuración está en `src/app/core/auth/cognito.config.ts`. El User Pool I
 App Client ID y dominio son identificadores públicos, pero **no se crea ni se
 guarda un client secret en Angular**. Los tokens se guardan en `sessionStorage`,
 por lo que se eliminan al cerrar la pestaña. La guía completa está en
-`docs/COGNITO_SETUP.md`.
+`docs/CONFIGURACION_COGNITO.md`.
 
 El guard de Angular exige el grupo exacto `Admin` para la experiencia visual. El
 BFF es el límite de seguridad final: valida firma, emisor, App Client,
