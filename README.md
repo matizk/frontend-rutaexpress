@@ -1,6 +1,6 @@
 # frontend-rutaexpress
 
-> Versión de integración EV2: `develop`, mediante el [PR #1](https://github.com/matizk/frontend-rutaexpress/pull/1). `main` conserva EV1 hasta una release validada. Ver [Gitflow](CONTRIBUTING.md). El login institucional y AWS/RDS siguen pendientes de verificación real.
+> Versión de integración EV2: `desarrollo`, mediante el [PR #1](https://github.com/matizk/frontend-rutaexpress/pull/1). `main` conserva EV1 hasta una release validada. Ver [Gitflow](CONTRIBUTING.md). El login institucional y AWS/RDS siguen pendientes de verificación real.
 
 Frontend Angular de RutaExpress para DSY1107 – Desarrollo Cloud Native.
 
@@ -108,8 +108,8 @@ Angular, CLI y build están fijados en 22.2.3, con package-lock.json regenerado 
 
 La imagen Nginx usa una plantilla con BFF_UPSTREAM, por defecto http://bff:8080. En el stack EV2 se configura mediante FRONTEND_API_UPSTREAM en .env.ev2 o con configurar-api.ps1. Admite un origen HTTPS y stage opcional, conserva /api y su query, usa SNI y valida certificados. El destino debe ser la API oficial del equipo, pues recibirá los bearer tokens. La configuración inválida se rechaza antes de iniciar Nginx.
 
-Guías de ejecución, diagnóstico y demostración: PREPARACION_EQUIPO_EV2.md y DEMOSTRACION_Y_EVIDENCIAS_EV2.md en la carpeta hermana ms-rutaexpress-shipments. Descargar `develop` en los seis repositorios para continuar la integración EV2; no clonar `main` esperando estas funciones. Consultar el PR enlazado para comprobar su fusión. El login Duoc y el despliegue cloud reales siguen pendientes.
+Guías de ejecución, diagnóstico y demostración: PREPARACION_EQUIPO_EV2.md y DEMOSTRACION_Y_EVIDENCIAS_EV2.md en la carpeta hermana ms-rutaexpress-shipments. Descargar `desarrollo` en los seis repositorios para continuar la integración EV2; no clonar `main` esperando estas funciones. Consultar el PR enlazado para comprobar su fusión. El login Duoc y el despliegue cloud reales siguen pendientes.
 
 ## Colaboracion y Gitflow
 
-Consultar [CONTRIBUTING.md](CONTRIBUTING.md). El PR comprueba pruebas/build Angular con Node 24 y auditoria de produccion; no despliega ni utiliza credenciales AWS/Azure. Una feature pasa a develop por revision; main solo debe recibir una release/hotfix aprobada.
+Consultar [CONTRIBUTING.md](CONTRIBUTING.md). El PR comprueba pruebas/build Angular con Node 24 y auditoria de produccion; no despliega ni utiliza credenciales AWS/Azure. Una feature pasa a desarrollo por revision; main solo debe recibir una release/hotfix aprobada.
