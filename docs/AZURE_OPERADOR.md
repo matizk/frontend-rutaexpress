@@ -21,7 +21,7 @@ La implementación exige esa API y versión de token: no sirve un ID token, un t
 
 ## Configurar los archivos sin duplicar datos a mano
 
-Con las carpetas hermanas del stack, ejecutar desde ms-rutaexpress-shipments:
+Con las carpetas hermanas del stack, ejecutar desde ms-rutaexpress-envios:
 
 ~~~powershell
 .\iniciar-ev2.ps1 -SoloConfigurar
