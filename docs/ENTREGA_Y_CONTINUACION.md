@@ -7,8 +7,8 @@ repositorios.
 
 Repositorios:
 
-- Frontend: `https://github.com/matizk/interfaz-rutaexpress.git`
-- BFF: `https://github.com/matizk/ms-rutaexpress-intermediario.git`
+- Frontend: `https://github.com/matizk/frontend-rutaexpress.git`
+- BFF: `https://github.com/matizk/ms-rutaexpress-bff.git`
 - Catálogo: `https://github.com/matizk/ms-rutaexpress-catalogo.git`
 - Envíos: `https://github.com/matizk/ms-rutaexpress-envios.git`
 - Reportes: `https://github.com/matizk/ms-rutaexpress-reportes.git`
@@ -29,8 +29,8 @@ Tracking público: Angular -> BFF -> Envíos
 ```powershell
 mkdir rutaexpress
 cd rutaexpress
-git clone https://github.com/matizk/interfaz-rutaexpress.git
-git clone https://github.com/matizk/ms-rutaexpress-intermediario.git
+git clone https://github.com/matizk/frontend-rutaexpress.git
+git clone https://github.com/matizk/ms-rutaexpress-bff.git
 git clone https://github.com/matizk/ms-rutaexpress-catalogo.git
 git clone https://github.com/matizk/ms-rutaexpress-envios.git
 git clone https://github.com/matizk/ms-rutaexpress-reportes.git
@@ -166,8 +166,8 @@ rutaexpress-report:local
 Para reconstruirlas desde la carpeta que contiene los cinco repositorios:
 
 ```powershell
-docker build -t rutaexpress-frontend:local .\interfaz-rutaexpress
-docker build -t rutaexpress-bff:local .\ms-rutaexpress-intermediario
+docker build -t rutaexpress-frontend:local .\frontend-rutaexpress
+docker build -t rutaexpress-bff:local .\ms-rutaexpress-bff
 docker build -t rutaexpress-catalog:local .\ms-rutaexpress-catalogo
 docker build -t rutaexpress-shipments:local .\ms-rutaexpress-envios
 docker build -t rutaexpress-report:local .\ms-rutaexpress-reportes
