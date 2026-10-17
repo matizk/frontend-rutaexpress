@@ -7,11 +7,11 @@ repositorios.
 
 Repositorios:
 
-- Frontend: `https://github.com/matizk/frontend-rutaexpress.git`
-- BFF: `https://github.com/matizk/ms-rutaexpress-bff.git`
-- Catálogo: `https://github.com/matizk/ms-rutaexpress-catalog.git`
-- Envíos: `https://github.com/matizk/ms-rutaexpress-shipments.git`
-- Reportes: `https://github.com/matizk/ms-rutaexpress-report.git`
+- Frontend: `https://github.com/matizk/interfaz-rutaexpress.git`
+- BFF: `https://github.com/matizk/ms-rutaexpress-intermediario.git`
+- Catálogo: `https://github.com/matizk/ms-rutaexpress-catalogo.git`
+- Envíos: `https://github.com/matizk/ms-rutaexpress-envios.git`
+- Reportes: `https://github.com/matizk/ms-rutaexpress-reportes.git`
 
 La solución ya tiene Cognito con grupo `Admin`, BFF con validación JWT, Catálogo, Envíos, Reportes, descuento de cupos, tracking público por código, PostgreSQL por servicio en Docker, pruebas y documentación.
 
@@ -29,11 +29,11 @@ Tracking público: Angular -> BFF -> Envíos
 ```powershell
 mkdir rutaexpress
 cd rutaexpress
-git clone https://github.com/matizk/frontend-rutaexpress.git
-git clone https://github.com/matizk/ms-rutaexpress-bff.git
-git clone https://github.com/matizk/ms-rutaexpress-catalog.git
-git clone https://github.com/matizk/ms-rutaexpress-shipments.git
-git clone https://github.com/matizk/ms-rutaexpress-report.git
+git clone https://github.com/matizk/interfaz-rutaexpress.git
+git clone https://github.com/matizk/ms-rutaexpress-intermediario.git
+git clone https://github.com/matizk/ms-rutaexpress-catalogo.git
+git clone https://github.com/matizk/ms-rutaexpress-envios.git
+git clone https://github.com/matizk/ms-rutaexpress-reportes.git
 ```
 
 Cada carpeta es un repositorio independiente. Para cambios nuevos, crear una rama
@@ -44,7 +44,7 @@ propia desde `main`, hacer commit y push en esa rama y abrir una Pull Request ha
 
 Requisitos: Git, Node.js LTS, JDK 21 y Docker Desktop.
 
-1. En `ms-rutaexpress-shipments`, copiar `.env.example` a `.env`, completar las contraseñas locales y ejecutar:
+1. En `ms-rutaexpress-envios`, copiar `.env.example` a `.env`, completar las contraseñas locales y ejecutar:
 
 ```powershell
 docker compose -f compose.local.yml up -d shipments-db
@@ -166,11 +166,11 @@ rutaexpress-report:local
 Para reconstruirlas desde la carpeta que contiene los cinco repositorios:
 
 ```powershell
-docker build -t rutaexpress-frontend:local .\frontend-rutaexpress
-docker build -t rutaexpress-bff:local .\ms-rutaexpress-bff
-docker build -t rutaexpress-catalog:local .\ms-rutaexpress-catalog
-docker build -t rutaexpress-shipments:local .\ms-rutaexpress-shipments
-docker build -t rutaexpress-report:local .\ms-rutaexpress-report
+docker build -t rutaexpress-frontend:local .\interfaz-rutaexpress
+docker build -t rutaexpress-bff:local .\ms-rutaexpress-intermediario
+docker build -t rutaexpress-catalog:local .\ms-rutaexpress-catalogo
+docker build -t rutaexpress-shipments:local .\ms-rutaexpress-envios
+docker build -t rutaexpress-report:local .\ms-rutaexpress-reportes
 ```
 
 Para esta entrega las imágenes se construyen y ejecutan mediante Docker Compose en
@@ -198,4 +198,4 @@ Callback local: http://localhost:4200/
 - Si el BFF devuelve `401`, revisar que el usuario pertenezca al grupo exacto `Admin`, que el token sea nuevo y que el `COGNITO_ISSUER_URI` corresponda al mismo User Pool.
 - Si el tracking devuelve `404`, verificar que se esté usando el código generado al crear el envío; la consulta pública no requiere iniciar sesión.
 - El primer arranque de PostgreSQL puede tardar. Esperar a que los contenedores estén saludables antes de iniciar Catálogo y Envíos.
-- Si se usa `compose.stack.yml`, ejecutarlo desde `ms-rutaexpress-shipments`; las cinco carpetas deben estar al mismo nivel y no se deben cambiar los nombres de las carpetas.
+- Si se usa `compose.stack.yml`, ejecutarlo desde `ms-rutaexpress-envios`; las cinco carpetas deben estar al mismo nivel y no se deben cambiar los nombres de las carpetas.
