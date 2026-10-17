@@ -1,6 +1,6 @@
-# interfaz-rutaexpress
+# frontend-rutaexpress
 
-> Versión de integración EV2: `desarrollo`, mediante el [PR #1](https://github.com/matizk/interfaz-rutaexpress/pull/1). `main` conserva EV1 hasta una entrega validada. Ver [Gitflow](COLABORACION.md). El login institucional y AWS/RDS siguen pendientes de verificación real.
+> Versión de integración EV2: `desarrollo`, mediante el [PR #1](https://github.com/matizk/frontend-rutaexpress/pull/1). `main` conserva EV1 hasta una entrega validada. Ver [Gitflow](COLABORACION.md). El login institucional y AWS/RDS siguen pendientes de verificación real.
 
 Frontend Angular de RutaExpress para DSY1107 – Desarrollo Cloud Native.
 
