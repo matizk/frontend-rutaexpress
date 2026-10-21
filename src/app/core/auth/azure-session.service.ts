@@ -28,7 +28,7 @@ export class AzureSessionService {
       return result.accessToken;
     } catch {
       // No automatic redirects from an HTTP interceptor or infinite login loops.
-      this.error.set('Tu sesión Azure necesita autorización. Pulsa Ingresar con cuenta Duoc para renovarla.');
+      this.error.set('Tu sesión Azure necesita autorización. Abre Mi acceso en el menú y vuelve a autorizar tu cuenta de operador.');
       return null;
     }
   }

@@ -11,16 +11,14 @@
   } @else if (admin.isAdmin()) {
     <p class="identity">Revisión con sesión administrativa Cognito</p>
     <small>Permite probar el flujo, pero no acredita el login institucional Azure de EV2.</small>
-  } @else { <p>Ingresa con tu cuenta Duoc para consultar y aceptar solicitudes.</p> }
+  } @else { <p>Para consultar y aceptar solicitudes, pulsa <strong>Acceder</strong> en el menú y elige <strong>Soy operador · Cuenta Duoc</strong>.</p> }
+  @if (azure.isAuthenticated() || admin.isAdmin()) {
+    <small>Para cambiar de cuenta o cerrar una sesión, gestiona tus accesos desde el menú.</small>
+  }
   @if (!azure.isConfigured()) {
     <p class="configuration">Azure pendiente de configuración: faltan tenant y registros frontend/API en <code>azure-config.json</code>. No se simula una sesión institucional.</p>
   }
   @if (azure.error()) { <p role="alert" class="error">{{ azure.error() }}</p> }
-  </div>
-  <div class="identity-actions">
-    <button type="button" (click)="azure.signIn()" [disabled]="!azure.isConfigured()">Ingresar con cuenta Duoc</button>
-    @if (azure.isAuthenticated()) { <button type="button" class="secondary" (click)="azure.signOut()">Salir de Microsoft</button> }
-    @if (!admin.isAdmin() && !azure.isAuthenticated()) { <a routerLink="/login">Acceso administrativo Cognito</a> }
   </div>
 </section>
 @if (access()) {

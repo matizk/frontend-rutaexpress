@@ -1,6 +1,6 @@
 # frontend-rutaexpress
 
-> Versión de integración EV2: `desarrollo`, mediante el [PR #1](https://github.com/matizk/frontend-rutaexpress/pull/1). `main` conserva EV1 hasta una entrega validada. Ver [Gitflow](COLABORACION.md). El login institucional y AWS/RDS siguen pendientes de verificación real.
+> Versión de integración EV2: `desarrollo`. La configuración pública de API Gateway, Azure y Cognito se integró mediante el [PR #7](https://github.com/matizk/frontend-rutaexpress/pull/7). `main` conserva EV1 hasta una entrega validada. Ver [Gitflow](COLABORACION.md). La configuración publicada y las pruebas automatizadas no acreditan por sí solas el acceso de cada cuenta institucional ni los resultados internos de AWS/RDS.
 
 Frontend Angular de RutaExpress para DSY1107 – Desarrollo Cloud Native.
 
@@ -9,6 +9,7 @@ Frontend Angular de RutaExpress para DSY1107 – Desarrollo Cloud Native.
 - Inicio público y vista de trazabilidad.
 - Consulta pública de tracking por código, sin exponer datos personales.
 - Pantalla de acceso y ruta administrativa protegida por un guard de Angular.
+- Acceso centralizado con perfiles separados: operador mediante Microsoft Entra ID y administrador mediante Cognito.
 - Panel para crear envíos y actualizar su estado.
 - Panel de Catálogo para administrar tarifas y cupos disponibles.
 - Integración exclusivamente por `/api` hacia el BFF; el navegador no debe llamar directamente a los microservicios de catálogo o envíos.
@@ -21,11 +22,22 @@ Angular LOCAL -> AWS API Gateway -> BFF -> Catálogo / Envíos / Mensajería / R
      +-> Azure: identidad del operador         PostgreSQL    RabbitMQ
 ```
 
-Durante desarrollo `proxy.conf.json` redirige `/api` a `http://localhost:8080`, donde debe ejecutarse el BFF. En AWS esa misma ruta será atendida por API Gateway.
+La configuración compartida de `proxy.conf.json` redirige `/api` al API Gateway HTTPS del equipo. Angular sigue ejecutándose en `http://localhost:4200`; no debe apuntarse el navegador a la IP pública de EC2. Para un entorno completamente local, el proxy puede configurarse de forma explícita hacia el BFF local, sin cambiar los contratos `/api`.
+
+## Acceso por perfil
+
+El menú ofrece un único enlace **Acceder** hacia `/login`. En esa pantalla se elige:
+
+- **Soy operador · Cuenta Duoc:** inicia Microsoft Entra ID para revisar solicitudes, aceptarlas y consultar sus tickets. La cuenta debe estar autorizada en el directorio del proyecto. No requiere iniciar antes una sesión Cognito.
+- **Soy administrador · Cognito:** inicia el acceso administrativo existente para catálogo, envíos, reportes y actividad; el backend sigue exigiendo el grupo Admin.
+
+Cuando hay una sesión abierta, el menú muestra su perfil e identidad y permite volver a **Mi acceso**. Si existen ambas sesiones, se identifican por separado y el enlace se llama **Mis accesos**. Cada perfil tiene su propio cierre de sesión en esa pantalla; salir de uno no cierra el otro. En Operador no se duplican botones de autenticación, y el seguimiento público permanece disponible sin sesión.
+
+La pantalla centraliza la interfaz, no los permisos ni los tokens. No modifica tenant, scopes, callbacks, authorizers ni validaciones del backend.
 
 ## Ejecutar localmente
 
-La opción recomendada es el stack Docker de la carpeta hermana ms-rutaexpress-envios, según su PREPARACION_EQUIPO_EV2.md. No requiere Node instalado en Windows. Para desarrollo fuera de Docker se probó Node 24.19 y npm 11:
+Con la configuración AWS compartida, basta iniciar Angular localmente; no se necesita levantar otra copia de los servicios cloud. Se probó Node 24.19 y npm 11:
 
 ```powershell
 npm ci
@@ -34,6 +46,8 @@ npm start
 
 Abre `http://localhost:4200`.
 
+Para pruebas completamente locales, el stack Docker de la carpeta hermana `ms-rutaexpress-envios` se documenta en su `PREPARACION_EQUIPO_EV2.md`. Ese modo es distinto del consumo de los servicios AWS existentes.
+
 ## Validación
 
 ```powershell
@@ -41,7 +55,8 @@ npm run build
 npm test -- --watch=false
 ```
 
-La integración se valida con 15 pruebas automatizadas del frontend. El tracking
+La integración se valida con pruebas automatizadas de selección de proveedor,
+identificación y cierre independiente de sesiones, configuración y operación. El tracking
 público consume `/api/shipments/track/{codigo}` y las operaciones administrativas
 usan el access token sólo en rutas `/api/` protegidas.
 

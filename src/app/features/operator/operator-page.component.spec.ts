@@ -36,6 +36,9 @@ describe('Operator workflow', () => {
     await Promise.resolve(); fixture.detectChanges();
     expect(api.list).not.toHaveBeenCalled();
     expect(text()).toContain('Azure pendiente de configuración');
+    expect(text()).toContain('Acceder');
+    expect(fixture.nativeElement.querySelector('.identity-card button')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.identity-card a')).toBeNull();
     expect(fixture.nativeElement.querySelector('.request')).toBeNull();
   });
   it('separates creation from acceptance and waits for the real RabbitMQ ticket', async () => {

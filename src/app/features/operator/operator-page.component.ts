@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { EMPTY, Subject, catchError, finalize, startWith, switchMap, take, timer } from 'rxjs';
 import { AuthSessionService } from '../../core/auth/auth-session.service';
@@ -11,7 +10,7 @@ import { Shipment, ShipmentStatus } from '../../core/shipments/shipment-api.serv
 import { MessageReceipt } from '../../core/messaging/messaging-api.service';
 
 @Component({
-  selector: 'app-operator-page', imports: [CommonModule, RouterLink],
+  selector: 'app-operator-page', imports: [CommonModule],
   templateUrl: './operator-page.component.html', styleUrl: './operator-page.component.scss',
 })
 export class OperatorPageComponent implements OnInit {
