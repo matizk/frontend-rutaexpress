@@ -6,9 +6,9 @@ const PENDING: string = 'REPLACE_ME';
 
 /** Identificadores públicos de Cognito. Una SPA nunca debe tener client secret. */
 export const cognitoConfig = {
-  userPoolId: 'us-east-1_omx1k5huI',
-  userPoolClientId: '41v988atubk0lrcmto285tk77i',
-  domain: 'us-east-1omx1k5hui.auth.us-east-1.amazoncognito.com',
+  userPoolId: 'us-east-1_uLyDkRP8y',
+  userPoolClientId: '7f6d81dggegrjlibqhavj2q0ti',
+  domain: 'rutaexpress-ev2-admin-529597838153.auth.us-east-1.amazoncognito.com',
   redirectSignIn: 'http://localhost:4200/',
   redirectSignOut: 'http://localhost:4200/',
 } as const;
