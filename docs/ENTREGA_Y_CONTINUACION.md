@@ -1,6 +1,8 @@
-# RutaExpress — guía para continuar
+# RutaExpress — antecedente histórico de EV1
 
-## Estado
+> **No usar este documento como guía de despliegue o configuración de EV2.** Describe la entrega anterior: sus cinco repositorios, IDs Cognito, bases en contenedores y publicación de Angular no son el estado vigente. Se conserva como antecedente sin modificar el historial. Para EV2 usar [README](../README.md), [Azure del operador](AZURE_OPERADOR.md) y [continuación del equipo](https://github.com/matizk/ms-rutaexpress-envios/blob/matizk/CONTINUAR_EV2_EQUIPO.md). EV2 añade Mensajería, Angular local, operador Azure y RDS; trabaja en rama personal → PR a `desarrollo`, no PR directo a `main`.
+
+## Estado histórico de EV1
 
 La versión final e integrada de la entrega se encuentra en `main` en los cinco
 repositorios.
@@ -177,7 +179,7 @@ Para esta entrega las imágenes se construyen y ejecutan mediante Docker Compose
 EC2. Publicarlas en ECR puede realizarse como mejora posterior, pero no es necesario
 para reproducir el despliegue actual.
 
-## Valores actuales de Cognito
+## Valores históricos de Cognito de EV1: no copiar a EV2
 
 Estos identificadores no son contraseñas ni secretos, pero deben coincidir entre el frontend, el BFF y la configuración de AWS:
 

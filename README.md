@@ -2,6 +2,8 @@
 
 > Versión de integración EV2: `desarrollo`. La configuración pública de API Gateway, Azure y Cognito se integró mediante el [PR #7](https://github.com/matizk/frontend-rutaexpress/pull/7). `main` conserva EV1 hasta una entrega validada. Ver [Gitflow](COLABORACION.md). La configuración publicada y las pruebas automatizadas no acreditan por sí solas el acceso de cada cuenta institucional ni los resultados internos de AWS/RDS.
 
+Actualización documental del 21-10-2026, preparada en `matizk`: se completó el caso `RX-1792623980566` con Azure Duoc, aceptación, ticket descargado y tracking público ACEPTADO. Daniel confirmó el mismo evento en RDS/RabbitMQ. El [PR #8](https://github.com/matizk/frontend-rutaexpress/pull/8), que contiene el acceso centralizado descrito abajo, sigue abierto hacia `desarrollo`; no asumir que ya está integrado. [Estado y pendientes del equipo](https://github.com/matizk/ms-rutaexpress-envios/blob/matizk/CONTINUAR_EV2_EQUIPO.md).
+
 Frontend Angular de RutaExpress para DSY1107 – Desarrollo Cloud Native.
 
 ## Qué resuelve
@@ -73,9 +75,7 @@ docker run --rm -p 4200:80 rutaexpress-frontend:local
 ## Seguridad: AWS Cognito
 
 El frontend usa la biblioteca oficial AWS Amplify con el Managed Login de Cognito.
-Solicita un **access token** mediante Authorization Code con PKCE y lo adjunta
-automáticamente sólo a las llamadas `/api/*`; el navegador nunca se conecta
-directamente a los microservicios.
+Solicita un **access token** mediante Authorization Code con PKCE. El interceptor adjunta Cognito a las rutas administrativas `/api/*`; para `/api/operator/*` con sesión Azure activa usa exclusivamente el access token de la API de operador, sin fallback silencioso a Cognito. No envía tokens a URLs externas. El navegador nunca se conecta directamente a los microservicios.
 
 La configuración está en `src/app/core/auth/cognito.config.ts`. El User Pool ID,
 App Client ID y dominio son identificadores públicos, pero **no se crea ni se
@@ -90,9 +90,7 @@ operación aunque alguien manipule el frontend.
 
 ## Estado
 
-La rama `main` contiene la versión funcional de la entrega: interfaz responsive,
-autenticación con Cognito, guard administrativo, tracking público, formularios de
-envíos, selector de servicios del Catálogo, reportes y proxy hacia el BFF.
+La rama `main` conserva la entrega anterior (EV1): interfaz responsive, Cognito, guard administrativo, tracking, formularios, Catálogo y Reportes. No es todavía la entrega final EV2. `desarrollo` contiene la integración del equipo; `matizk` contiene el acceso centralizado del PR #8 y esta corrección documental, pendientes de revisión e integración. Consultar GitHub antes de actualizar una copia propia; no sobrescribir cambios ajenos.
 
 ## Despliegue AWS
 
@@ -113,9 +111,11 @@ ajustar allí los orígenes y registrarlos también en el App Client de Cognito.
 
 Operación incluye un panel que consulta `/api/messaging/summary` y `/api/messaging/receipts` a través del BFF. Actualiza los resultados cada cinco segundos, permite buscar entre los últimos 100 registros y descargar un comprobante de texto por evento. Son resultados reales persistidos por los consumidores; las notificaciones son internas y no representan emails enviados. El stack de prueba se inicia desde `ms-rutaexpress-envios/iniciar-ev2.ps1` e incluye la nueva carpeta hermana `ms-rutaexpress-mensajeria`.
 
-## Operador y Azure (avance EV2 local)
+## Operador y Azure: integración probada
 
-`/operador` separa la revisión y aceptación de las solicitudes de su registro administrativo. Muestra el ticket de aceptación procesado por RabbitMQ y permite descargarlo; no confunde un evento CREADO con una confirmación. Incluye MSAL y configuración pública en `public/azure-config.json`, deshabilitada hasta obtener los datos reales del tenant. BFF, Envíos y Mensajería validan el JWT de operador y no le conceden Admin. Cognito administrativo sigue disponible para revisar el flujo, identificado como tal. Falta probar login Duoc y cloud reales. Pasos y límites en [AZURE_OPERADOR.md](docs/AZURE_OPERADOR.md).
+`/operador` separa la revisión y aceptación de las solicitudes de su registro administrativo. Muestra el ticket de aceptación procesado por RabbitMQ y permite descargarlo; no confunde un evento CREADO con una confirmación. MSAL está habilitado y `public/azure-config.json` contiene los identificadores públicos reales integrados por PR #7. BFF, Envíos y Mensajería validan el JWT de operador y no le conceden Admin. Cognito permanece como acceso administrativo separado, permitido por la aclaración docente.
+
+El integrante probó login/logout institucional, aceptó `RX-1792623980566` y descargó su ticket. El tracking público devuelve ACEPTADO; Daniel confirmó el evento `d88da0d8-4f06-42b0-9f6d-03c7916052c1` en outbox y recepciones AUDIT, NOTIFICATION y TICKET. Esta inspección interna se atribuye a Daniel, no a las pruebas unitarias. Pasos, configuración y límites en [AZURE_OPERADOR.md](docs/AZURE_OPERADOR.md). No publicar capturas con identidad sin revisarlas y sanitizarlas.
 
 ## Dependencias y destino de API
 
@@ -123,7 +123,7 @@ Angular, CLI y build están fijados en 22.2.3, con package-lock.json regenerado 
 
 La imagen Nginx usa una plantilla con BFF_UPSTREAM, por defecto http://bff:8080. En el stack EV2 se configura mediante FRONTEND_API_UPSTREAM en .env.ev2 o con configurar-api.ps1. Admite un origen HTTPS y stage opcional, conserva /api y su query, usa SNI y valida certificados. El destino debe ser la API oficial del equipo, pues recibirá los bearer tokens. La configuración inválida se rechaza antes de iniciar Nginx.
 
-Guías de ejecución, diagnóstico y demostración: PREPARACION_EQUIPO_EV2.md y DEMOSTRACION_Y_EVIDENCIAS_EV2.md en la carpeta hermana ms-rutaexpress-envios. Descargar `desarrollo` en los seis repositorios para continuar la integración EV2; no clonar `main` esperando estas funciones. Consultar el PR enlazado para comprobar su fusión. El login Duoc y el despliegue cloud reales siguen pendientes.
+Guías de ejecución, diagnóstico y demostración: PREPARACION_EQUIPO_EV2.md y DEMOSTRACION_Y_EVIDENCIAS_EV2.md en la carpeta hermana ms-rutaexpress-envios. Descargar `desarrollo` en los seis repositorios para continuar la integración EV2; no clonar `main` esperando estas funciones. El acceso centralizado del PR #8 y la corrección documental de esta pasada se revisan desde `matizk` hasta su integración. Faltan la auditoría completa de evidencias de pauta, informe/presentación y cierre Git aprobado, no repetir el login ya comprobado ni reconstruir AWS.
 
 ## Colaboracion y Gitflow
 
