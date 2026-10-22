@@ -2,7 +2,7 @@
 
 > Versión de integración EV2: `desarrollo`. La configuración pública de API Gateway, Azure y Cognito se integró mediante el [PR #7](https://github.com/matizk/frontend-rutaexpress/pull/7). `main` conserva EV1 hasta una entrega validada. Ver [Gitflow](COLABORACION.md). La configuración publicada y las pruebas automatizadas no acreditan por sí solas el acceso de cada cuenta institucional ni los resultados internos de AWS/RDS.
 
-Actualización documental del 21-10-2026, preparada en `matizk`: se completó el caso `RX-1792623980566` con Azure Duoc, aceptación, ticket descargado y tracking público ACEPTADO. Daniel confirmó el mismo evento en RDS/RabbitMQ. El [PR #8](https://github.com/matizk/frontend-rutaexpress/pull/8), que contiene el acceso centralizado descrito abajo, sigue abierto hacia `desarrollo`; no asumir que ya está integrado. [Estado y pendientes del equipo](https://github.com/matizk/ms-rutaexpress-envios/blob/matizk/CONTINUAR_EV2_EQUIPO.md).
+Actualización documental del 21-10-2026: se completó el caso `RX-1792623980566` con Azure Duoc, aceptación, ticket descargado y tracking público ACEPTADO. Daniel confirmó el mismo evento en RDS/RabbitMQ. El [PR #8](https://github.com/matizk/frontend-rutaexpress/pull/8) contiene el acceso centralizado descrito abajo y la corrección de seguridad posterior; consultar su estado y comprobaciones para saber si ya está integrado en `desarrollo`. [Estado y pendientes del equipo](https://github.com/matizk/ms-rutaexpress-envios/blob/matizk/CONTINUAR_EV2_EQUIPO.md).
 
 Frontend Angular de RutaExpress para DSY1107 – Desarrollo Cloud Native.
 
@@ -90,7 +90,7 @@ operación aunque alguien manipule el frontend.
 
 ## Estado
 
-La rama `main` conserva la entrega anterior (EV1): interfaz responsive, Cognito, guard administrativo, tracking, formularios, Catálogo y Reportes. No es todavía la entrega final EV2. `desarrollo` contiene la integración del equipo; `matizk` contiene el acceso centralizado del PR #8 y esta corrección documental, pendientes de revisión e integración. Consultar GitHub antes de actualizar una copia propia; no sobrescribir cambios ajenos.
+La rama `main` conserva la entrega anterior (EV1): interfaz responsive, Cognito, guard administrativo, tracking, formularios, Catálogo y Reportes. No es todavía la entrega final EV2. `desarrollo` es la integración del equipo y `matizk` la rama personal. Consultar los PR y sus comprobaciones para conocer la integración vigente antes de actualizar una copia propia; no sobrescribir cambios ajenos ni confundir un merge a `desarrollo` con el cierre de la evaluación.
 
 ## Despliegue AWS
 
@@ -119,11 +119,15 @@ El integrante probó login/logout institucional, aceptó `RX-1792623980566` y de
 
 ## Dependencias y destino de API
 
+Corrección de seguridad del 22-10-2026: se fija Vite `8.3.5` mediante `overrides` porque Angular Build `22.2.3` solicita la versión vulnerable `8.3.0`. No se actualiza Angular a otra serie ni se cambian los proveedores de identidad. Se regenera el lockfile y se verifica con instalación limpia, tests, build y auditoría completa. Alcance, fuentes y mantenimiento del override en [SEGURIDAD_DEPENDENCIAS.md](docs/SEGURIDAD_DEPENDENCIAS.md).
+
+El CI instala con `npm ci --no-audit` para evitar una consulta de auditoría duplicada durante la instalación y ejecuta después un paso **obligatorio** `npm audit`, ahora incluyendo producción y desarrollo. No se omiten severidades, no se ignoran fallos y se mantienen límites/reintentos de red acotados. Un timeout o error del registro sigue impidiendo aprobar el job.
+
 Angular, CLI y build están fijados en 22.2.3, con package-lock.json regenerado y comprobado mediante npm ci. La auditoría del 15-10-2026 terminó con cero alertas conocidas en producción y desarrollo; las pruebas y el build de producción pasaron. Esto no certifica ausencia de vulnerabilidades en todo el sistema.
 
 La imagen Nginx usa una plantilla con BFF_UPSTREAM, por defecto http://bff:8080. En el stack EV2 se configura mediante FRONTEND_API_UPSTREAM en .env.ev2 o con configurar-api.ps1. Admite un origen HTTPS y stage opcional, conserva /api y su query, usa SNI y valida certificados. El destino debe ser la API oficial del equipo, pues recibirá los bearer tokens. La configuración inválida se rechaza antes de iniciar Nginx.
 
-Guías de ejecución, diagnóstico y demostración: PREPARACION_EQUIPO_EV2.md y DEMOSTRACION_Y_EVIDENCIAS_EV2.md en la carpeta hermana ms-rutaexpress-envios. Descargar `desarrollo` en los seis repositorios para continuar la integración EV2; no clonar `main` esperando estas funciones. El acceso centralizado del PR #8 y la corrección documental de esta pasada se revisan desde `matizk` hasta su integración. Faltan la auditoría completa de evidencias de pauta, informe/presentación y cierre Git aprobado, no repetir el login ya comprobado ni reconstruir AWS.
+Guías de ejecución, diagnóstico y demostración: PREPARACION_EQUIPO_EV2.md y DEMOSTRACION_Y_EVIDENCIAS_EV2.md en la carpeta hermana ms-rutaexpress-envios. Descargar `desarrollo` en los seis repositorios para continuar la integración EV2; no clonar `main` esperando estas funciones. Consultar el estado del PR #8 y el CI de la rama de integración. Faltan la auditoría completa de evidencias de pauta, informe/presentación y cierre Git aprobado, no repetir el login ya comprobado ni reconstruir AWS.
 
 ## Colaboracion y Gitflow
 

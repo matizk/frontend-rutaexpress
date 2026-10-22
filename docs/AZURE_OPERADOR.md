@@ -15,7 +15,7 @@ El directorio de proyecto es `DanielProyecto`, single-tenant. La cuenta académi
 | Callback | `http://localhost:4200/auth/azure` |
 | Gateway | `https://awnqdvxvd9.execute-api.us-east-1.amazonaws.com` |
 
-El [PR #8](https://github.com/matizk/frontend-rutaexpress/pull/8) centraliza la interfaz en **Acceder → Soy operador · Cuenta Duoc** y ofrece el logout en **Mi acceso**. Sigue abierto; comprobar la rama antes de buscar esos botones. No modifica los parámetros de esta tabla ni concede permisos nuevos.
+El [PR #8](https://github.com/matizk/frontend-rutaexpress/pull/8) centraliza la interfaz en **Acceder → Soy operador · Cuenta Duoc** y ofrece el logout en **Mi acceso**. Consultar su estado de integración y comprobar la rama antes de buscar esos botones. No modifica los parámetros de esta tabla ni concede permisos nuevos. La corrección posterior de Vite y auditoría de dependencias tampoco cambia tenant, aplicaciones, scopes o permisos.
 
 ## Antes de configurar
 
