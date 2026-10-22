@@ -1,1 +1,52 @@
-<section class="login-layout"><div class="login-card"><p class="eyebrow">ACCESO OPERACIONAL</p><h1>Bienvenido a RutaExpress</h1><p>Autentícate con AWS Cognito. La pantalla administrada por AWS entregará un access token y el BFF volverá a validar su firma y el grupo Admin.</p><button type="button" (click)="signIn()" [disabled]="!session.isConfigured()"><span class="microsoft">☁</span> Iniciar sesión con Cognito</button>@if (!session.isConfigured()) { <small>La integración está lista en código, pero faltan los datos del User Pool y del App Client. Sigue la guía <code>docs/COGNITO_SETUP.md</code>.</small> } @if (session.error()) { <p class="auth-error" role="alert">{{ session.error() }}</p> }</div></section>
+<section class="login-layout" aria-labelledby="access-title">
+  <div class="access-page">
+    <header class="access-heading">
+      <p class="eyebrow">UN SOLO LUGAR PARA TUS ACCESOS</p>
+      <h1 id="access-title">Elige tu acceso</h1>
+      <p>Operador y administrador tienen funciones distintas. Elige el perfil con el que vas a trabajar.</p>
+    </header>
+    <div class="access-grid">
+      <article class="access-card operator-access" aria-labelledby="operator-title">
+        <p class="provider">MICROSOFT ENTRA ID</p>
+        <h2 id="operator-title">Operador</h2>
+        <p>Revisa y acepta las solicitudes de envío con tu cuenta institucional Duoc.</p>
+        <ul><li>Revisar solicitudes y sus datos.</li><li>Confirmar su aceptación.</li><li>Consultar y descargar el ticket.</li></ul>
+        @if (azure.isAuthenticated()) {
+          <div class="session-info"><span>Sesión de operador</span><strong>{{ azure.displayName() }}</strong></div>
+          <a class="primary-action" routerLink="/operador">Ir a solicitudes</a>
+          <div class="session-actions">
+            <button type="button" class="text-action" (click)="useAccess('operator', 'signIn')" [disabled]="busy() || !azure.isConfigured()">Cambiar cuenta Microsoft</button>
+            <button type="button" class="text-action" data-testid="operator-sign-out" (click)="useAccess('operator', 'signOut')" [disabled]="busy()">Cerrar sesión de operador</button>
+          </div>
+        } @else {
+          <button type="button" class="primary-action" data-testid="operator-sign-in" (click)="useAccess('operator', 'signIn')" [disabled]="busy() || !azure.isConfigured()">Soy operador · Cuenta Duoc</button>
+          <small>Tu cuenta debe estar autorizada en el directorio de Azure del proyecto. No necesitas entrar antes como administrador.</small>
+        }
+        @if (!azure.isConfigured()) { <p class="configuration">Falta completar la configuración de Azure. Consulta al administrador del proyecto.</p> }
+        @if (azure.error()) { <p class="auth-error" role="alert">{{ azure.error() }}</p> }
+      </article>
+      <article class="access-card admin-access" aria-labelledby="admin-title">
+        <p class="provider">AMAZON COGNITO</p>
+        <h2 id="admin-title">Administrador</h2>
+        <p>Gestiona el catálogo y la operación con tu cuenta administrativa del proyecto.</p>
+        <ul><li>Administrar servicios, tarifas y cupos.</li><li>Registrar envíos y actualizar sus estados.</li><li>Consultar reportes y actividad.</li></ul>
+        @if (session.isAuthenticated()) {
+          <div class="session-info"><span>Sesión de Cognito</span><strong>{{ session.displayName() }}</strong></div>
+          @if (session.isAdmin()) { <a class="primary-action" routerLink="/admin">Ir a operación</a> }
+          @else { <p class="auth-error" role="alert">Esta cuenta no pertenece al grupo Admin y no tiene acceso administrativo.</p> }
+          <button type="button" class="text-action" data-testid="admin-sign-out" (click)="useAccess('admin', 'signOut')" [disabled]="busy()">Cerrar sesión de Cognito</button>
+        } @else {
+          <button type="button" class="primary-action" data-testid="admin-sign-in" (click)="useAccess('admin', 'signIn')" [disabled]="busy() || !session.isConfigured()">Soy administrador · Cognito</button>
+          <small>Este acceso no inicia una sesión de operador en Microsoft.</small>
+        }
+        @if (!session.isConfigured()) { <p class="configuration">Falta completar la configuración de Cognito. Consulta al administrador del proyecto.</p> }
+        @if (session.error()) { <p class="auth-error" role="alert">{{ session.error() }}</p> }
+      </article>
+    </div>
+    @if (busy()) { <p class="access-status" role="status">Abriendo el acceso seleccionado…</p> }
+    @if (azure.isAuthenticated() && session.isAuthenticated()) {
+      <p class="access-note">Tienes dos sesiones abiertas. Cerrar una no cierra la otra: utiliza el botón del perfil que corresponda.</p>
+    }
+    <p class="public-access">¿Solo necesitas consultar un envío? <a routerLink="/" fragment="tracking">El seguimiento es público y no requiere iniciar sesión.</a></p>
+  </div>
+</section>

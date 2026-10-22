@@ -1,8 +1,7 @@
 import { Component, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { PublicTrackingResponse, ShipmentApiService } from '../../core/shipments/shipment-api.service';
 
-@Component({ selector: 'app-home-page', imports: [RouterLink], templateUrl: './home-page.component.html', styleUrl: './home-page.component.scss' })
+@Component({ selector: 'app-home-page', templateUrl: './home-page.component.html', styleUrl: './home-page.component.scss' })
 export class HomePageComponent {
   protected readonly trackingCode = signal('');
   protected readonly trackingResult = signal<PublicTrackingResponse | null>(null);

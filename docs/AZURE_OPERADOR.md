@@ -2,17 +2,28 @@
 
 ## Estado real
 
-Hay una pantalla separada en /operador, integración con MSAL Browser 5.25.1 y validación de tokens Azure en BFF, Envíos y Mensajería. Azure está deshabilitado por defecto: no se inventaron identificadores, no se modificó el tenant y no se probó una cuenta Duoc real. El administrador anterior sigue usando Cognito.
+Actualizado al 21-10-2026. Hay una pantalla separada en /operador, integración con MSAL Browser 5.25.1 y validación de tokens Azure en BFF, Envíos y Mensajería. La configuración pública real está habilitada e integrada en `desarrollo` por el [PR #7](https://github.com/matizk/frontend-rutaexpress/pull/7). El integrante ya probó login Duoc, logout visible, aceptación, descarga de ticket y tracking público del caso `RX-1792623980566`. Daniel confirmó el mismo evento en RDS/RabbitMQ. El administrador sigue usando Cognito; la docente permitió conservarlo y centra EV2 en el operador Azure.
 
-La configuración y el consentimiento del tenant académico todavía deben completarse con quien tenga los accesos. Esta guía no pide comprar Entra Premium ni crear grupos/usuarios nuevos.
+El directorio de proyecto es `DanielProyecto`, single-tenant. La cuenta académica del integrante necesitó una invitación externa a ese directorio; después de aceptarla pudo completar el flujo. El error previo AADSTS50020 no demostraba que su cuenta estuviera borrada ni obligaba a activar una suscripción Azure propia. No relajar issuer/tenant/audience/scope ni cambiar a multitenant como atajo. Cualquier permiso o consentimiento adicional se coordina con el responsable del directorio.
+
+| Parámetro público | Valor compartido |
+| --- | --- |
+| Tenant ID | `6289a099-2080-4d8e-84ef-8c98e42b2599` |
+| SPA Client ID | `55e07a0c-c96a-4e1b-95d2-7c3b06117828` |
+| API Client ID | `fc461744-8d40-4e06-b5f9-7530c9f19d2b` |
+| Scope delegado | `api://fc461744-8d40-4e06-b5f9-7530c9f19d2b/operator.access` |
+| Callback | `http://localhost:4200/auth/azure` |
+| Gateway | `https://awnqdvxvd9.execute-api.us-east-1.amazonaws.com` |
+
+El [PR #8](https://github.com/matizk/frontend-rutaexpress/pull/8) centraliza la interfaz en **Acceder → Soy operador · Cuenta Duoc** y ofrece el logout en **Mi acceso**. Consultar su estado de integración y comprobar la rama antes de buscar esos botones. No modifica los parámetros de esta tabla ni concede permisos nuevos. La corrección posterior de Vite y auditoría de dependencias tampoco cambia tenant, aplicaciones, scopes o permisos.
 
 ## Antes de configurar
 
-Obtener del equipo tres UUID públicos: tenant, aplicación SPA frontend y aplicación API backend. No enviar contraseñas, client secrets, códigos de acceso ni tokens al chat o a GitHub.
+Los tres UUID públicos ya están en la tabla y en `public/azure-config.json`. Los pasos siguientes describen cómo revisar o reproducir la configuración, no una tarea pendiente de crear otras aplicaciones. No enviar contraseñas, client secrets, códigos de acceso ni tokens al chat o a GitHub.
 
 En los registros existentes de Microsoft Entra, con los permisos que permita el tenant:
 
-1. El frontend es una **SPA** del tenant institucional. Registrar el callback exacto **http://localhost:4200/auth/azure**. Si se publica otro origen HTTPS, registrar también su callback exacto con /auth/azure. Registrar /operador del origen como retorno tras logout si el tenant lo requiere.
+1. El frontend es una **SPA** del tenant del proyecto, al que accede la cuenta académica autorizada. Mantener el callback exacto **http://localhost:4200/auth/azure**. Si se publica otro origen HTTPS con autorización, registrar también su callback exacto con /auth/azure. Mantener el retorno de logout alineado con la configuración de la aplicación.
 2. En el registro de la API, usar tokens de acceso **v2** (api.requestedAccessTokenVersion: 2 en el manifiesto) y exponer el Application ID URI **api://UUID-API**.
 3. Exponer un permiso delegado **operator.access** (o usar el nombre real acordado), concederlo al frontend y obtener consentimiento institucional si se solicita. Pedir a un administrador del tenant que lo autorice cuando la cuenta académica no tenga permisos; no intentar eludir ese control.
 4. Mantener el acceso limitado al tenant del proyecto y sus políticas. El permiso de operador se comprueba en nuestra API por tenant, cliente autorizado y scope delegado, no por el texto del correo. No crear grupos no significa hacer pública la API.
@@ -21,7 +32,7 @@ La implementación exige esa API y versión de token: no sirve un ID token, un t
 
 ## Configurar los archivos sin duplicar datos a mano
 
-Con las carpetas hermanas del stack, ejecutar desde ms-rutaexpress-envios:
+Para consumir el AWS actual, basta `npm ci` y `npm start` desde el frontend, con `http://localhost:4200`; no ejecutar el stack local ni reconfigurar IDs por defecto. Solo para un laboratorio local elegido expresamente, con las carpetas hermanas, los scripts de ms-rutaexpress-envios permiten alinear las variables:
 
 ~~~powershell
 .\iniciar-ev2.ps1 -SoloConfigurar
@@ -43,13 +54,13 @@ Compose pasa la misma configuración a BFF, Envíos y Mensajería. Angular obtie
 ## Recorrido de demostración
 
 1. El administrador entra con Cognito y registra desde **Operación** una solicitud con servicio disponible. Queda en CREADO. Esta es la interfaz actual de registro: no se presenta como un portal autónomo de cliente ni como registro público de usuarios.
-2. Abrir /operador e ingresar con cuenta Duoc mediante Microsoft. Una sesión Azure no concede acceso a Catálogo, Reportes ni Rabbit Admin.
+2. En la versión de acceso centralizado del PR #8, usar **Acceder → Soy operador · Cuenta Duoc** y volver a /operador. Una sesión Azure no concede acceso a Catálogo, Reportes ni Rabbit Admin.
 3. Seleccionar la solicitud pendiente, revisar sus datos y pulsar **Aceptar solicitud**. El backend solo permite pasar de CREADO a ACEPTADO. Bloquea la fila al cambiar de estado; dos operadores concurrentes no producen dos aceptaciones.
 4. Envíos guarda el cambio y su outbox en la misma transacción. RabbitMQ procesa el evento y Mensajería persiste el ticket.
 5. El panel consulta cada tres segundos hasta encontrar un ticket TICKET / shipment.status_changed / ACEPTADO. Un 404 significa que todavía no existe; se reintenta. No se ofrece un comprobante CREADO como confirmación.
 6. Descargar la confirmación y consultar tracking público. El ticket acredita aceptación, no entrega. Los envíos históricos pueden no tener un evento de aceptación de EV2.
 
-Con una sesión Cognito Admin válida también se puede revisar la bandeja. La pantalla lo identifica como **revisión administrativa Cognito**: sirve para probar funcionalidad local, no para acreditar el login Azure.
+El código conserva una revisión local de la bandeja con Cognito Admin, identificada como tal; no acredita login Azure. El Gateway cloud separa authorizers por ruta según el traspaso de Daniel: utilizar Azure para la prueba de operador, sin asumir que Cognito autoriza las rutas del operador en ese Gateway.
 
 ## Seguridad y endpoints
 
@@ -71,7 +82,9 @@ Con una sesión Cognito Admin válida también se puede revisar la bandeja. La p
 
 Ejecutar npm test -- --watch=false, npm run build y mvnw.cmd test en BFF, Envíos y Mensajería. Hay pruebas con claves RSA/JWKS locales que comprueban firmas y rechazo de tenant/audience/cliente/scope incorrectos, expiración y falta de permisos. Las pruebas controladas no son evidencia de un login real en Microsoft.
 
-Falta verificar con el equipo: login institucional, consentimiento del scope, configuración JWT del API Manager y recorrido con EC2/RDS reales. La respuesta escrita de la docente aportada el 15-10-2026 confirma que Angular se ejecuta localmente en EV2: no se exige desplegar el frontend ahora. Su publicación es opcional y se solicitará en entrega 3 y/o ET. Mantener el callback local y comprobar que Angular consume los servicios remotos reales.
+El recorrido institucional ya se completó y se correlacionó con la confirmación interna de Daniel. Las consultas públicas repetidas devolvieron salud/tracking HTTP 200 y HTTP 401 para listado de operador y catálogo sin JWT. Reunir además la evidencia de authorizers, tokens inválidos y separación de permisos; no afirmar que esos cuatro GET prueban todas las combinaciones de autorización. El cierre de sesión visible no garantiza revocación inmediata de todo JWT emitido ni cierre de todas las sesiones Microsoft.
+
+La respuesta escrita de la docente confirma que Angular se ejecuta localmente en EV2: no se exige desplegar el frontend ahora; se solicita en la siguiente entrega. Mantener el callback local y los servicios AWS existentes. Faltan auditoría de evidencias, informe/presentación y revisión Git, no crear otro entorno para repetir lo ya probado.
 
 La alerta previa de Angular Router 22.1.6 y las alertas de herramientas de desarrollo se corrigieron actualizando el conjunto Angular/CLI/build a 22.2.3 y regenerando el lockfile sin force ni legacy-peer-deps. El 15-10-2026 npm audit y npm audit --omit=dev terminaron con cero alertas conocidas; las 15 pruebas Angular y la compilación de producción pasaron. La aplicación sigue siendo SPA estática, sin SSR. Repetir la auditoría al actualizar o preparar una entrega; cero alertas no equivale a seguridad universal.
 

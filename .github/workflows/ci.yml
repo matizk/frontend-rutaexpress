@@ -14,6 +14,11 @@ jobs:
   angular:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      NPM_CONFIG_FETCH_TIMEOUT: '30000'
+      NPM_CONFIG_FETCH_RETRIES: '2'
+      NPM_CONFIG_FETCH_RETRY_MINTIMEOUT: '1000'
+      NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: '5000'
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
@@ -35,7 +40,10 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - run: npm ci
+      # La auditoría obligatoria se ejecuta una sola vez, al final y sobre todo el árbol.
+      - name: Instalar dependencias del lockfile
+        run: npm ci --no-audit
       - run: npm test -- --watch=false
       - run: npm run build
-      - run: npm audit --omit=dev
+      - name: Auditar dependencias de producción y desarrollo
+        run: npm audit

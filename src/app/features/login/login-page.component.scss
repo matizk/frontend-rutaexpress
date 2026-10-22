@@ -1,2 +1,33 @@
-.login-layout { align-items:center; background:linear-gradient(135deg,#071627,#123d59); display:flex; justify-content:center; min-height:calc(100dvh - 4.5rem); padding:1.5rem; }.login-card { background:white; border-radius:1rem; max-width:31rem; padding:2.5rem; }.eyebrow { color:#168f82; font-size:.72rem; font-weight:800; letter-spacing:.12em; }.login-card h1 { color:#0d2941; font-size:2.2rem; letter-spacing:-.05em; margin:.5rem 0 1rem; }.login-card p { color:#587086; line-height:1.6; }.login-card button { background:#0d2941; border:0; border-radius:.5rem; color:white; cursor:pointer; font:inherit; font-weight:700; margin:1.5rem 0 .8rem; padding:.9rem 1rem; width:100%; }.login-card button:disabled { background:#6f8495; cursor:not-allowed; }.microsoft { color:#55d6be; font-size:1.2rem; margin-right:.35rem; }.login-card small { color:#698092; display:block; font-size:.75rem; line-height:1.45; }
-.auth-error { color: #b42318; font-size: .9rem; margin-top: 1rem; }
+:host { display:block; }
+.login-layout { background:linear-gradient(135deg,#071627,#123d59); min-height:calc(100dvh - 4.5rem); padding:3rem 7vw; }
+.access-page { margin:auto; max-width:62rem; }
+.access-heading { max-width:42rem; margin-bottom:2rem; }
+.eyebrow,.provider { font-size:.7rem; font-weight:800; letter-spacing:.12em; }
+.eyebrow { color:#75ddc9; }
+h1 { color:#fff; font-size:clamp(2rem,4vw,2.8rem); letter-spacing:-.05em; margin:.65rem 0 1rem; }
+.access-heading > p:last-child { color:#c8d8e5; line-height:1.65; }
+.access-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.5rem; }
+.access-card { background:#fff; border:1px solid #d8e4ec; border-radius:1rem; padding:2rem; min-width:0; }
+.operator-access { border-top:4px solid #55d6be; }
+.admin-access { border-top:4px solid #7f9ab0; }
+.provider { color:#146e67; margin:0 0 .7rem; }
+h2 { color:#0d2941; font-size:1.7rem; letter-spacing:-.04em; margin:0 0 .8rem; }
+.access-card p,.access-card li { color:#4f6578; font-size:.93rem; line-height:1.6; }
+ul { padding-left:1.2rem; margin:1.25rem 0 1.5rem; }
+li + li { margin-top:.4rem; }
+.primary-action { align-items:center; background:#127c73; border:0; border-radius:.5rem; color:#fff; cursor:pointer; display:flex; font:inherit; font-size:.9rem; font-weight:750; justify-content:center; min-height:3rem; padding:.8rem 1rem; text-align:center; text-decoration:none; width:100%; }
+.admin-access .primary-action { background:#0d2941; }
+button:disabled { cursor:not-allowed; opacity:.55; }
+small { color:#536b7d; display:block; font-size:.78rem; line-height:1.6; margin-top:1rem; }
+.session-info { background:#edf7f4; border-radius:.5rem; display:grid; gap:.35rem; margin:1.25rem 0 1rem; padding:.9rem; }
+.session-info span { color:#4f6578; font-size:.75rem; }
+.session-info strong { color:#0d2941; overflow-wrap:anywhere; }
+.session-actions { display:grid; }
+.text-action { background:transparent; border:0; color:#126c65; cursor:pointer; display:block; font:inherit; font-size:.8rem; margin:.5rem auto 0; padding:.6rem .25rem; text-decoration:underline; }
+.access-card .auth-error { background:#fff1ef; border-radius:.4rem; color:#a32929; font-size:.85rem; padding:.75rem; }
+.access-card .configuration { font-size:.8rem; }
+.access-note,.access-status { background:#153e54; border:1px solid #476879; border-radius:.5rem; color:#e4f0f7; font-size:.85rem; line-height:1.6; padding:1rem; }
+.public-access { color:#c8d8e5; font-size:.85rem; line-height:1.65; margin-top:1.75rem; }
+.public-access a { color:#85e5d2; }
+a:focus-visible,button:focus-visible { outline:3px solid #e7a629; outline-offset:4px; }
+@media(max-width:700px) { .login-layout { padding:2rem 1.25rem; } .access-grid { grid-template-columns:1fr; } .access-card { padding:1.5rem; } }
