@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthSessionService } from './core/auth/auth-session.service';
+import { AzureSessionService } from './core/auth/azure-session.service';
 
 @Component({
   imports: [RouterLink, RouterLinkActive, RouterOutlet],
@@ -9,5 +10,5 @@ import { AuthSessionService } from './core/auth/auth-session.service';
   templateUrl: './app.html',
 })
 export class App {
-  constructor(protected readonly session: AuthSessionService) {}
+  constructor(protected readonly session: AuthSessionService, protected readonly azure: AzureSessionService) {}
 }

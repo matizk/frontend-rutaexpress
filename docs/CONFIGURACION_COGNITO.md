@@ -1,6 +1,6 @@
 # Configuración de AWS Cognito
 
-Esta guía corresponde al acceso administrativo de EV1. Para la configuración vigente del operador institucional, consultar la documentación de la rama desarrollo.
+Esta guía describe el acceso administrativo; el acceso institucional del operador se configura en [AZURE_OPERADOR.md](AZURE_OPERADOR.md).
 
 El frontend utiliza el **Managed Login** de un Cognito User Pool. Es una SPA
 pública: debe utilizar Authorization Code con PKCE y **no puede tener client secret**.

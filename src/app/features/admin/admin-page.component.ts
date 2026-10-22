@@ -5,8 +5,9 @@ import { CatalogApiService, CatalogService } from '../../core/catalog/catalog-ap
 import { Shipment, ShipmentApiService, ShipmentStatus } from '../../core/shipments/shipment-api.service';
 import { AuthSessionService } from '../../core/auth/auth-session.service';
 import { UserApiService } from '../../core/auth/user-api.service';
+import { MessagingPanelComponent } from './messaging-panel.component';
 
-@Component({ selector: 'app-admin-page', imports: [CommonModule, ReactiveFormsModule], templateUrl: './admin-page.component.html', styleUrl: './admin-page.component.scss' })
+@Component({ selector: 'app-admin-page', imports: [CommonModule, ReactiveFormsModule, MessagingPanelComponent], templateUrl: './admin-page.component.html', styleUrl: './admin-page.component.scss' })
 export class AdminPageComponent implements OnInit {
   protected readonly shipments = signal<Shipment[]>([]);
   protected readonly services = signal<CatalogService[]>([]);

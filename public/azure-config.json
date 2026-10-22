@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "tenantId": "6289a099-2080-4d8e-84ef-8c98e42b2599",
+  "clientId": "55e07a0c-c96a-4e1b-95d2-7c3b06117828",
+  "apiClientId": "fc461744-8d40-4e06-b5f9-7530c9f19d2b",
+  "scope": "operator.access",
+  "redirectPath": "/auth/azure"
+}

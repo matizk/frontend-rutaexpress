@@ -1,6 +1,16 @@
 <header class="topbar">
   <a class="brand" routerLink="/" aria-label="RutaExpress inicio"><span class="brand-mark">R</span><span>Ruta<span>Express</span></span></a>
-  <nav aria-label="Navegación principal"><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a><a routerLink="/admin" routerLinkActive="active">Operación</a><a routerLink="/catalogo" routerLinkActive="active">Catálogo</a><a routerLink="/reportes" routerLinkActive="active">Reportes</a></nav>
-  @if (session.isAuthenticated()) { <button class="user-chip" type="button" (click)="session.signOut()">{{ session.displayName() }} <span>Salir</span></button> } @else { <a class="login-link" routerLink="/login">Iniciar sesión</a> }
+  <nav aria-label="Navegación principal"><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a><a routerLink="/admin" routerLinkActive="active">Operación</a><a routerLink="/operador" routerLinkActive="active">Operador</a><a routerLink="/catalogo" routerLinkActive="active">Catálogo</a><a routerLink="/reportes" routerLinkActive="active">Reportes</a></nav>
+  <div class="access-summary">
+    @if (azure.isAuthenticated()) {
+      <span class="session-label"><strong>Operador · Microsoft</strong><span>{{ azure.displayName() }}</span></span>
+    }
+    @if (session.isAuthenticated()) {
+      <span class="session-label"><strong>{{ session.isAdmin() ? 'Administrador · Cognito' : 'Cognito · Sin permiso Admin' }}</strong><span>{{ session.displayName() }}</span></span>
+    }
+    <a class="login-link" routerLink="/login">
+      {{ azure.isAuthenticated() && session.isAuthenticated() ? 'Mis accesos' : azure.isAuthenticated() || session.isAuthenticated() ? 'Mi acceso' : 'Acceder' }}
+    </a>
+  </div>
 </header>
 <main><router-outlet /></main>
