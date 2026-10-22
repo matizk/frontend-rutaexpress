@@ -1,8 +1,8 @@
 # frontend-rutaexpress
 
-> Versión de integración EV2: `desarrollo`. La configuración pública de API Gateway, Azure y Cognito se integró mediante el [PR #7](https://github.com/matizk/frontend-rutaexpress/pull/7). `main` conserva EV1 hasta una entrega validada. Ver [Gitflow](COLABORACION.md). La configuración publicada y las pruebas automatizadas no acreditan por sí solas el acceso de cada cuenta institucional ni los resultados internos de AWS/RDS.
+> Entrega de código EV2 del 22-10-2026: publicación mediante `release/ev2` → PR a `main`, conservando los commits del equipo. `main` es la rama estable y `desarrollo` la integración; el trabajo personal continúa en `matizk`. Ver [Gitflow](COLABORACION.md). Publicar el código no sustituye el informe, las evidencias completas de la pauta ni la presentación.
 
-Actualización documental del 21-10-2026: se completó el caso `RX-1792623980566` con Azure Duoc, aceptación, ticket descargado y tracking público ACEPTADO. Daniel confirmó el mismo evento en RDS/RabbitMQ. El [PR #8](https://github.com/matizk/frontend-rutaexpress/pull/8) contiene el acceso centralizado descrito abajo y la corrección de seguridad posterior; consultar su estado y comprobaciones para saber si ya está integrado en `desarrollo`. [Estado y pendientes del equipo](https://github.com/matizk/ms-rutaexpress-envios/blob/matizk/CONTINUAR_EV2_EQUIPO.md).
+El 21-10-2026 se completó el caso `RX-1792623980566` con Azure Duoc, aceptación, ticket descargado y tracking público ACEPTADO. Daniel confirmó el mismo evento en RDS/RabbitMQ. Los [PR #7](https://github.com/matizk/frontend-rutaexpress/pull/7) y [PR #8](https://github.com/matizk/frontend-rutaexpress/pull/8) ya quedaron integrados en `desarrollo`: configuración AWS/Azure/Cognito, acceso centralizado y corrección de Vite. La validación del 22-10-2026 aprobó 26 pruebas, compilación y auditoría completa de dependencias. [Estado y pendientes del equipo](https://github.com/matizk/ms-rutaexpress-envios/blob/desarrollo/CONTINUAR_EV2_EQUIPO.md). La evidencia privada de AWS se atribuye al responsable que la obtuvo.
 
 Frontend Angular de RutaExpress para DSY1107 – Desarrollo Cloud Native.
 
