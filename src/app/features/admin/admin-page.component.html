@@ -1,4 +1,58 @@
-<section class="admin-header"><div><p class="eyebrow">PANEL ADMINISTRATIVO</p><h1>Operación de envíos</h1><p>Gestiona tus envíos y consulta sus comprobantes y actualizaciones.</p></div><button type="button" (click)="load()">Actualizar datos</button></section>
+<section class="admin-header page-header"><div><p class="eyebrow">ESPACIO DE ADMINISTRACIÓN</p><h1>Envíos</h1><p>Registra solicitudes y sigue el avance de tu operación.</p></div><button type="button" (click)="load()" [disabled]="loading() || servicesLoading()">{{ loading() || servicesLoading() ? 'Actualizando…' : 'Actualizar datos' }}</button></section>
 @if (error()) { <p class="notice" role="alert">{{ error() }}</p> }
-<section class="admin-grid"><form class="create-card" [formGroup]="form" (ngSubmit)="create()"><h2>Nuevo envío</h2><label>Destinatario<input formControlName="nombreDestinatario" placeholder="Nombre completo" /></label><label>Correo<input formControlName="emailDestinatario" type="email" placeholder="correo@ejemplo.com" /></label><label>Origen<input formControlName="direccionOrigen" /></label><label>Destino<input formControlName="direccionDestino" placeholder="Comuna o dirección" /></label><label>Peso (kg)<input formControlName="pesoKg" type="number" min="0.1" step="0.1" /></label><label>Servicio<select formControlName="servicioId"><option [ngValue]="0" disabled>Selecciona un servicio</option>@for (service of services(); track service.id) { <option [ngValue]="service.id">{{ service.nombre }} · {{ service.precio | currency:'CLP':'symbol-narrow':'1.0-0' }} ({{ service.cantidadDisponible }} cupos)</option> }</select></label>@if (!services().length) { <p class="service-hint">No hay servicios con cupos disponibles.</p> }<button type="submit">Crear envío</button></form><div class="shipments-card"><div class="card-heading"><div><h2>Envíos recientes</h2><span>{{ shipments().length }} registros</span></div></div>@if (loading()) { <p class="empty">Consultando BFF…</p> } @else if (!shipments().length) { <p class="empty">Aún no hay envíos cargados.</p> } @else { <div class="shipment-list">@for (shipment of shipments(); track shipment.id) { <article class="shipment-row"><div><strong>{{ shipment.codigoSeguimiento }}</strong><span>{{ shipment.nombreDestinatario }} · {{ shipment.direccionOrigen }} → {{ shipment.direccionDestino }}</span><small>{{ shipment.servicioNombre || 'Envío histórico sin servicio asociado' }}</small></div><div class="shipment-actions"><span class="status" [class]="shipment.estado.toLowerCase()">{{ shipment.estado }}</span><select [value]="shipment.estado" (change)="updateStatus(shipment, $any($event.target).value)">@for (status of statuses; track status) { <option [value]="status">{{ status }}</option> }</select></div></article> }</div> }</div></section>
+@if (!loading() && servicesLoaded() && !servicesLoading() && !error()) { <div class="summary-strip"><div><span>Envíos cargados</span><strong>{{ shipments().length }}</strong></div><div><span>Servicios con cupos</span><strong>{{ services().length }}</strong></div><p>Las nuevas solicitudes quedan pendientes de revisión por el operador.</p></div> }
+<section class="admin-grid">
+  <form class="create-card" [formGroup]="form" (ngSubmit)="create()">
+    <div class="form-heading"><span class="form-symbol" aria-hidden="true">+</span><div><h2>Nueva solicitud</h2><p>Completa los datos para registrar el envío.</p></div></div>
+    <fieldset><legend>Datos del destinatario</legend>
+      <label>Nombre completo<input formControlName="nombreDestinatario" autocomplete="name" placeholder="Nombre del destinatario" [attr.aria-invalid]="form.controls.nombreDestinatario.touched && form.controls.nombreDestinatario.invalid" /></label>
+      @if (form.controls.nombreDestinatario.touched && form.controls.nombreDestinatario.invalid) { <small class="field-error">Ingresa el nombre del destinatario.</small> }
+      <label>Correo electrónico<input formControlName="emailDestinatario" type="email" autocomplete="email" placeholder="nombre@ejemplo.com" [attr.aria-invalid]="form.controls.emailDestinatario.touched && form.controls.emailDestinatario.invalid" /></label>
+      @if (form.controls.emailDestinatario.touched && form.controls.emailDestinatario.invalid) { <small class="field-error">Ingresa un correo válido.</small> }
+    </fieldset>
+    <fieldset><legend>Recorrido del envío</legend>
+      <label>Origen<input formControlName="direccionOrigen" placeholder="Ciudad o dirección de origen" [attr.aria-invalid]="form.controls.direccionOrigen.touched && form.controls.direccionOrigen.invalid" /></label>
+      <label>Destino<input formControlName="direccionDestino" placeholder="Ciudad o dirección de destino" [attr.aria-invalid]="form.controls.direccionDestino.touched && form.controls.direccionDestino.invalid" /></label>
+      @if ((form.controls.direccionOrigen.touched && form.controls.direccionOrigen.invalid) || (form.controls.direccionDestino.touched && form.controls.direccionDestino.invalid)) { <small class="field-error">Completa el origen y el destino.</small> }
+    </fieldset>
+    <fieldset><legend>Servicio y carga</legend>
+      <label>Peso en kilogramos<input formControlName="pesoKg" type="number" min="0.1" step="0.1" [attr.aria-invalid]="form.controls.pesoKg.touched && form.controls.pesoKg.invalid" /></label>
+      <label>Servicio<select formControlName="servicioId" [attr.aria-invalid]="form.controls.servicioId.touched && form.controls.servicioId.invalid"><option [ngValue]="0" disabled>Selecciona un servicio</option>@for (service of services(); track service.id) { <option [ngValue]="service.id">{{ service.nombre }} · {{ service.precio | currency:'CLP':'symbol-narrow':'1.0-0' }} ({{ service.cantidadDisponible }} cupos)</option> }</select></label>
+      @if ((form.controls.pesoKg.touched && form.controls.pesoKg.invalid) || (form.controls.servicioId.touched && form.controls.servicioId.invalid)) { <small class="field-error">Indica un peso desde 0,1 kg y selecciona un servicio.</small> }
+      @if (servicesLoading()) { <p class="service-hint" role="status">Consultando servicios y cupos disponibles…</p> }
+      @else if (servicesError()) { <p class="service-hint">No pudimos comprobar los servicios ni sus cupos. Vuelve a actualizar antes de crear una solicitud.</p> }
+      @else if (servicesLoaded() && !services().length) { <p class="service-hint">No hay servicios con cupos disponibles. Revisa el catálogo antes de crear la solicitud.</p> }
+    </fieldset>
+    <button type="submit" [disabled]="creating() || loading() || !!loadError() || servicesLoading() || !servicesLoaded() || !!servicesError() || !services().length">{{ creating() ? 'Creando solicitud…' : 'Crear solicitud' }} <span aria-hidden="true">→</span></button>
+  </form>
+  <div class="shipments-card"><div class="card-heading"><div><h2>Envíos recientes</h2>@if (loading()) { <p>Consultando envíos…</p> } @else if (loadError()) { <p>Sin datos disponibles</p> } @else { <p>{{ shipments().length }} registros cargados</p> }</div></div>
+    @if (loading()) { <p class="empty" role="status">Consultando envíos…</p> }
+    @else if (loadError()) { <div class="empty"><strong>No pudimos cargar los envíos</strong><p>Revisa el aviso y vuelve a actualizar. No podemos confirmar cuántos envíos hay registrados.</p></div> }
+    @else if (!shipments().length) { <div class="empty"><strong>Aquí comienza tu operación</strong><p>Crea una solicitud con el formulario. Luego el operador podrá revisarla.</p></div> }
+    @else {
+      <div class="shipment-list">
+        @for (shipment of shipments(); track shipment.id) {
+          <article class="shipment-row">
+            <div>
+              <strong>{{ shipment.codigoSeguimiento }}</strong>
+              <span>{{ shipment.nombreDestinatario }}</span>
+              <span>{{ shipment.direccionOrigen }} → {{ shipment.direccionDestino }}</span>
+              <small>{{ shipment.servicioNombre || 'Envío histórico sin servicio asociado' }}</small>
+            </div>
+            <div class="shipment-actions">
+              <span class="status-badge" [attr.data-status]="shipment.estado">{{ shipment.estado.replace('_', ' ') }}</span>
+              <label>Cambiar estado
+                <select [ngModel]="shipment.estado" [ngModelOptions]="{ standalone: true }" #estadoControl="ngModel"
+                  (ngModelChange)="updateStatus(shipment, $event, estadoControl.control)"
+                  [attr.aria-label]="'Estado de ' + shipment.codigoSeguimiento">
+                  @for (status of statuses; track status) { <option [value]="status">{{ status.replace('_', ' ') }}</option> }
+                </select>
+              </label>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</section>
 <app-messaging-panel />

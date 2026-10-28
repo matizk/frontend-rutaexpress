@@ -1,7 +1,9 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
+import { finalize } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CatalogApiService, CatalogService } from '../../core/catalog/catalog-api.service';
+import { mensajeErrorApi } from '../../core/http/errores-api';
 
 @Component({
   selector: 'app-catalog-page',
@@ -12,7 +14,10 @@ import { CatalogApiService, CatalogService } from '../../core/catalog/catalog-ap
 export class CatalogPageComponent implements OnInit {
   protected readonly services = signal<CatalogService[]>([]);
   protected readonly loading = signal(false);
-  protected readonly error = signal('');
+  protected readonly loadError = signal('');
+  private readonly actionError = signal('');
+  protected readonly saving = signal(false);
+  protected readonly error = computed(() => this.actionError() || this.loadError());
   protected readonly editingId = signal<number | null>(null);
   protected readonly form;
 
@@ -30,38 +35,42 @@ export class CatalogPageComponent implements OnInit {
   }
 
   protected load(): void {
+    if (this.loading()) return;
     this.loading.set(true);
-    this.error.set('');
+    this.loadError.set(''); this.actionError.set('');
     this.api.list().subscribe({
       next: (services) => {
         this.services.set(services);
         this.loading.set(false);
       },
-      error: () => {
-        this.error.set('No se pudo cargar el catálogo. Inicia PostgreSQL, Catálogo y el BFF.');
+      error: error => {
+        this.services.set([]);
+        this.loadError.set(mensajeErrorApi(error, 'cargar los servicios'));
         this.loading.set(false);
       },
     });
   }
 
   protected save(): void {
+    if (this.loading() || this.loadError() || this.saving()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
     const request = this.form.getRawValue();
+    this.actionError.set(''); this.saving.set(true);
     const currentId = this.editingId();
     const operation = currentId === null
       ? this.api.create(request)
       : this.api.update(currentId, request);
 
-    operation.subscribe({
+    operation.pipe(finalize(() => this.saving.set(false))).subscribe({
       next: () => {
         this.cancelEdit();
         this.load();
       },
-      error: () => this.error.set('No fue posible guardar el servicio. Revisa tu sesión Admin y los datos ingresados.'),
+      error: error => this.actionError.set(mensajeErrorApi(error, 'guardar el servicio')),
     });
   }
 

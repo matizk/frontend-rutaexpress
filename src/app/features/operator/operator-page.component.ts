@@ -2,15 +2,18 @@ import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 import { EMPTY, Subject, catchError, finalize, startWith, switchMap, take, timer } from 'rxjs';
 import { AuthSessionService } from '../../core/auth/auth-session.service';
 import { AzureSessionService } from '../../core/auth/azure-session.service';
 import { OperatorApiService } from '../../core/operator/operator-api.service';
 import { Shipment, ShipmentStatus } from '../../core/shipments/shipment-api.service';
 import { MessageReceipt } from '../../core/messaging/messaging-api.service';
+import { mensajeErrorApi } from '../../core/http/errores-api';
 
 @Component({
-  selector: 'app-operator-page', imports: [CommonModule],
+  host: { class: 'workspace-page' },
+  selector: 'app-operator-page', imports: [CommonModule, RouterLink],
   templateUrl: './operator-page.component.html', styleUrl: './operator-page.component.scss',
 })
 export class OperatorPageComponent implements OnInit {
@@ -20,8 +23,19 @@ export class OperatorPageComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly refresh = new Subject<void>();
   private readonly selectedShipment = new Subject<Shipment | null>();
-  protected readonly access = computed(() => this.azure.isAuthenticated() || this.admin.isAdmin());
+  protected readonly access = computed(() => this.azure.isAuthenticated());
   protected readonly requests = signal<Shipment[]>([]);
+  protected readonly search = signal('');
+  protected readonly visibleRequests = computed(() => {
+    const query = this.normalize(this.search().trim());
+    return this.requests().filter(shipment => this.normalize(
+      `${shipment.codigoSeguimiento} ${shipment.direccionOrigen} ${shipment.direccionDestino}`,
+    ).includes(query));
+  });
+  protected readonly statusLabels: Record<ShipmentStatus, string> = {
+    CREADO: 'Pendiente', ACEPTADO: 'Aceptado', EN_BODEGA: 'En bodega',
+    EN_RUTA: 'En ruta', ENTREGADO: 'Entregado', CANCELADO: 'Cancelado',
+  };
   protected readonly selected = signal<Shipment | null>(null);
   protected readonly ticket = signal<MessageReceipt | null>(null);
   protected readonly filter = signal<ShipmentStatus>('CREADO');
@@ -38,9 +52,11 @@ export class OperatorPageComponent implements OnInit {
       switchMap(() => {
         if (!this.access()) return EMPTY;
         this.loading.set(true);
+        this.error.set('');
         return this.api.list(this.filter()).pipe(
           catchError((error: HttpErrorResponse) => {
-            this.error.set(this.apiError(error)); return EMPTY;
+            this.requests.set([]);
+            this.error.set(mensajeErrorApi(error, 'cargar las solicitudes', 'operador')); return EMPTY;
           }), finalize(() => this.loading.set(false)));
       }), takeUntilDestroyed(this.destroyRef),
     ).subscribe(items => { this.requests.set(items); this.error.set(''); });
@@ -55,7 +71,6 @@ export class OperatorPageComponent implements OnInit {
     }), takeUntilDestroyed(this.destroyRef)).subscribe(ticket => {
       this.ticket.set(ticket); this.ticketWaiting.set(false); this.ticketError.set('');
     });
-    void this.admin.initialize().then(() => this.reload());
   }
   protected reload(): void { this.refresh.next(); }
   protected changeFilter(value: string): void {
@@ -74,7 +89,7 @@ export class OperatorPageComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)).subscribe({
       next: accepted => {
         this.selected.set(accepted); this.selectedShipment.next(accepted);
-        this.notice.set('Solicitud aceptada. RabbitMQ generará el ticket de confirmación.');
+        this.notice.set('Solicitud aceptada. Estamos preparando tu confirmación.');
         this.reload();
       },
       error: (error: HttpErrorResponse) => {
@@ -97,8 +112,9 @@ export class OperatorPageComponent implements OnInit {
     link.download = receipt.trackingCode + '-confirmacion.txt'; link.click(); URL.revokeObjectURL(url);
   }
   private apiError(error: HttpErrorResponse): string {
-    if (error.status === 401) return 'La sesión no es válida para esta API. Inicia sesión de nuevo y comprueba la configuración Azure.';
-    if (error.status === 403) return 'Tu cuenta no tiene permiso para esta acción.';
-    return error.error?.message ?? 'No se pudo completar la operación. Comprueba el BFF y los servicios.';
+    return mensajeErrorApi(error, 'completar la operación', 'operador');
+  }
+  private normalize(value: string): string {
+    return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   }
 }

@@ -7,11 +7,11 @@
     @if (updatedAt()) { <small>Última actualización: {{ updatedAt() | date:'HH:mm:ss' }}</small> }
   </div>
   @if (error()) { <p class="notice" role="alert">{{ error() }}</p> }
-  <div class="totals">
+  @if (updatedAt()) { <div class="totals">
     <div><strong>{{ summary().notifications }}</strong><span>Notificaciones internas</span></div>
     <div><strong>{{ summary().tickets }}</strong><span>Comprobantes generados</span></div>
     <div><strong>{{ summary().audit }}</strong><span>Eventos registrados</span></div>
-  </div>
+  </div> }
   <label class="search">Buscar entre los últimos 100 registros
     <input type="search" placeholder="Código de envío, por ejemplo RX-…" [value]="search()" (input)="search.set($any($event.target).value)" />
   </label>
@@ -25,7 +25,7 @@
         </div>
       </article>
     } @empty {
-      <p class="empty">{{ updatedAt() ? 'No hay actividad que coincida. Los nuevos envíos aparecerán aquí al procesarse.' : 'Consultando la actividad…' }}</p>
+      <p class="empty">{{ error() && !updatedAt() ? 'No pudimos cargar la actividad. No hay datos disponibles para mostrar.' : updatedAt() ? 'No hay actividad que coincida. Los nuevos envíos aparecerán aquí al procesarse.' : 'Consultando la actividad…' }}</p>
     }
   </div>
 </section>

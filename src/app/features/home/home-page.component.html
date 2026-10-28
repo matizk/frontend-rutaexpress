@@ -1,3 +1,37 @@
-<section class="hero"><div class="hero-copy"><p class="eyebrow">LOGÍSTICA CLOUD NATIVE</p><h1>Tu envío avanza.<br /><span>Tú lo ves.</span></h1><p class="lead">RutaExpress conecta clientes, operación y trazabilidad en una plataforma preparada para la nube.</p><div class="hero-actions"><a class="primary-action" href="#tracking">Consultar envío</a></div></div><div class="route-card"><div class="route-card__top"><span>ENVÍO EN CURSO</span><strong>RX-2026-0178</strong></div><div class="route-line"><span class="origin"></span><i></i><span class="destination"></span></div><div class="route-labels"><span>Santiago</span><span>Valparaíso</span></div><div class="route-status"><span></span> En ruta · Actualizado hace 8 min</div></div></section>
-<section id="tracking" class="tracking-section"><div><p class="eyebrow">TRAZABILIDAD</p><h2>¿Dónde está tu envío?</h2><p>Ingresa el código de seguimiento que recibiste al crear tu despacho.</p></div><form (submit)="$event.preventDefault(); search()"><label for="tracking-code">Código de seguimiento</label><div class="tracking-input"><input id="tracking-code" [value]="trackingCode()" (input)="trackingCode.set($any($event.target).value)" placeholder="Ej: RX-2026-0178" /><button type="submit">Consultar</button></div>@if (trackingLoading()) { <small>Consultando estado…</small> } @else if (trackingError()) { <small>{{ trackingError() }}</small> } @else if (trackingResult(); as shipment) { <small>{{ shipment.codigoSeguimiento }} · {{ shipment.estado }} · {{ shipment.direccionOrigen }} → {{ shipment.direccionDestino }}</small> }</form></section>
-<section class="benefits"><article><b>01</b><h3>Estado visible</h3><p>Cada etapa del envío queda registrada y disponible para la operación.</p></article><article><b>02</b><h3>Servicios integrados</h3><p>Catálogo, envíos y BFF separados para una arquitectura mantenible.</p></article><article><b>03</b><h3>Seguridad primero</h3><p>Operador con Microsoft y administrador con Cognito: elige tu perfil desde Acceder.</p></article></section>
+<section class="hero">
+  <div class="hero-copy">
+    <p class="hero-label"><span aria-hidden="true"></span> Tu operación, conectada</p>
+    <h1>Cada envío,<br /><span>más claro.</span></h1>
+    <p class="lead">Sigue tu envío, revisa solicitudes y mantén tu operación en movimiento. Todo, en un mismo lugar.</p>
+    <div class="hero-note"><span class="note-icon icon-tile" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4 8 9 8 9s8-5 8-9V6l-8-3Z"/><path d="m8 12 3 3 5-6"/></svg></span><div><strong>Tu seguimiento es público</strong><span>Solo necesitas el código de tu envío.</span></div></div>
+    <svg class="route-illustration" viewBox="0 0 320 40" fill="none" aria-hidden="true"><path d="M25 20h112m46 0h112" stroke="#b3cbc5" stroke-dasharray="3 4"/><circle cx="12" cy="20" r="5" stroke="currentColor" stroke-width="2"/><circle cx="308" cy="20" r="5" fill="currentColor"/><g transform="translate(145 5)" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M2 5h17v16H2zM19 11h6l6 7v3H19"/><circle cx="8" cy="23" r="3" fill="var(--canvas)"/><circle cx="26" cy="23" r="3" fill="var(--canvas)"/></g></svg>
+  </div>
+  <section id="tracking" class="tracking-card surface-card" aria-labelledby="tracking-title">
+    <div class="tracking-heading"><span class="tracking-icon icon-tile" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3ZM4 7.5l8 4.5 8-4.5M12 12v9"/></svg></span><span class="public-label">Sin iniciar sesión</span></div>
+    <h2 id="tracking-title">¿Dónde está tu envío?</h2>
+    <p class="tracking-intro">Consulta su estado con tu código de seguimiento.</p>
+    <form (submit)="$event.preventDefault(); search()" [attr.aria-busy]="trackingLoading()">
+      <label for="tracking-code">Código de seguimiento</label>
+      <div class="tracking-input"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input id="tracking-code" autocomplete="off" autocapitalize="characters" spellcheck="false" [value]="trackingCode()" (input)="trackingCode.set($any($event.target).value)" placeholder="Ingresa tu código RX-…" [attr.aria-invalid]="trackingError() ? true : null" aria-describedby="tracking-help" /></div>
+      <button class="action-button" type="submit" [disabled]="trackingLoading()">{{ trackingLoading() ? 'Consultando…' : 'Consultar envío' }}<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button>
+      <small id="tracking-help">Lo encuentras en la solicitud o en tu confirmación.</small>
+    </form>
+    @if (trackingError()) { <p class="tracking-error" role="alert">{{ trackingError() }}</p> }
+    @if (trackingResult(); as shipment) {
+      <article class="tracking-result" aria-live="polite" aria-label="Resultado del seguimiento">
+        <div class="result-heading"><strong>{{ shipment.codigoSeguimiento }}</strong><span class="status-badge" [attr.data-status]="shipment.estado">{{ statusLabels[shipment.estado] }}</span></div>
+        <dl><div><dt>Origen</dt><dd>{{ shipment.direccionOrigen }}</dd></div><div><dt>Destino</dt><dd>{{ shipment.direccionDestino }}</dd></div></dl>
+        <p class="result-updated">Última actualización: {{ shipment.fechaActualizacion | date:'dd/MM/yyyy · HH:mm' }}</p>
+        @if (shipment.estado === 'ACEPTADO') { <p class="result-note">La solicitud fue aceptada. La entrega del envío es una etapa posterior.</p> }
+      </article>
+    }
+  </section>
+</section>
+<section class="workflow" aria-labelledby="workflow-title">
+  <div class="section-heading"><div><p class="eyebrow">Del registro a la confirmación</p><h2 id="workflow-title">Un recorrido simple.</h2></div><p>Cada perfil tiene una tarea.<br />Cada solicitud, un siguiente paso.</p></div>
+  <div class="steps">
+    <article class="surface-card"><span class="step-number">01</span><h3>Se registra la solicitud</h3><p>Administración ingresa los datos del envío y selecciona el servicio disponible.</p><span class="step-role">Administración</span></article>
+    <article class="surface-card"><span class="step-number">02</span><h3>El operador la revisa</h3><p>Comprueba los datos y confirma su aceptación desde su bandeja de solicitudes.</p><span class="step-role">Operador · Cuenta Duoc</span></article>
+    <article class="surface-card"><span class="step-number">03</span><h3>La confirmación queda lista</h3><p>El operador descarga el comprobante y el estado puede consultarse con el código.</p><span class="step-role">Seguimiento público</span></article>
+  </div>
+</section>

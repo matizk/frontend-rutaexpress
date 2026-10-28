@@ -21,6 +21,8 @@ describe('MessagingPanelComponent', () => {
     await vi.advanceTimersByTimeAsync(0);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('[role="alert"]')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.totals')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('No pudimos cargar la actividad');
     await vi.advanceTimersByTimeAsync(5000);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('[role="alert"]')).toBeNull();
