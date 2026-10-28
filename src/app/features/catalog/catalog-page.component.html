@@ -1,10 +1,10 @@
 <section class="catalog-header">
   <div>
-    <p class="eyebrow">CONFIGURACIÓN COMERCIAL</p>
+    <p class="eyebrow">ESPACIO DE ADMINISTRACIÓN</p>
     <h1>Catálogo de servicios</h1>
-    <p>Administra tarifas y capacidad disponible a través del BFF.</p>
+    <p>Organiza tus servicios, tarifas y cupos disponibles.</p>
   </div>
-  <button type="button" (click)="load()">Actualizar datos</button>
+  <button type="button" (click)="load()" [disabled]="loading() || saving()">{{ loading() ? 'Actualizando…' : 'Actualizar datos' }}</button>
 </section>
 
 @if (error()) { <p class="notice" role="alert">{{ error() }}</p> }
@@ -21,15 +21,17 @@
       <label>Tarifa (CLP)<input formControlName="precio" type="number" min="0" step="1" /></label>
       <label>Capacidad<input formControlName="cantidadDisponible" type="number" min="0" step="1" /></label>
     </div>
-    <button class="primary" type="submit">{{ editingId() === null ? 'Crear servicio' : 'Guardar cambios' }}</button>
+    <button class="primary" type="submit" [disabled]="loading() || !!loadError() || saving()">{{ saving() ? 'Guardando…' : editingId() === null ? 'Crear servicio' : 'Guardar cambios' }}</button>
   </form>
 
   <section class="services-card">
-    <div class="card-heading"><div><h2>Servicios disponibles</h2><span>{{ services().length }} registros</span></div></div>
+    <div class="card-heading"><div><h2>Servicios disponibles</h2>@if (loading()) { <span>Consultando servicios…</span> } @else if (loadError()) { <span>Sin datos disponibles</span> } @else { <span>{{ services().length }} registros</span> }</div></div>
     @if (loading()) {
-      <p class="empty">Consultando BFF…</p>
+      <p class="empty" role="status">Consultando servicios…</p>
+    } @else if (loadError()) {
+      <p class="empty">No pudimos cargar los servicios. Revisa el aviso y vuelve a actualizar.</p>
     } @else if (!services().length) {
-      <p class="empty">Aún no hay servicios cargados.</p>
+      <p class="empty">Aún no hay servicios. Crea el primero para comenzar a registrar solicitudes.</p>
     } @else {
       <div class="service-list">
         @for (service of services(); track service.id) {

@@ -52,6 +52,18 @@ describe('App', () => {
     expect(root.textContent).not.toContain('Administración de prueba');
   });
 
+  it('ofrece la navegación administrativa solo a una sesión con permiso Admin', () => {
+    const fixture = TestBed.createComponent(App); fixture.detectChanges();
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('nav a[href="/admin"]')).toBeNull();
+    expect(root.querySelector('nav a[href="/catalogo"]')).toBeNull();
+    admin.isAuthenticated.set(true); fixture.detectChanges();
+    expect(root.querySelector('nav a[href="/admin"]')?.textContent).toBe('Envíos');
+    admin.isAdmin.set(false); fixture.detectChanges();
+    expect(root.querySelector('nav a[href="/admin"]')).toBeNull();
+    expect(root.querySelector('nav a[href="/operador"]')).not.toBeNull();
+  });
+
   it('identifica las dos sesiones sin presentar a Cognito como sesión Microsoft', () => {
     admin.isAuthenticated.set(true); operator.isAuthenticated.set(true);
     const fixture = TestBed.createComponent(App); fixture.detectChanges();
