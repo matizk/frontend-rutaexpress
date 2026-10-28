@@ -1,13 +1,13 @@
 <section class="login-layout" aria-labelledby="access-title">
   <div class="access-page">
     <header class="access-heading">
-      <p class="eyebrow">UN SOLO LUGAR PARA TUS ACCESOS</p>
-      <h1 id="access-title">Elige tu acceso</h1>
-      <p>Operador y administrador tienen funciones distintas. Elige el perfil con el que vas a trabajar.</p>
+      <p class="eyebrow">TU ESPACIO DE TRABAJO</p>
+      <h1 id="access-title">¿Cómo quieres trabajar?</h1>
+      <p>Elige tu perfil. Te llevamos a las herramientas que necesitas.</p>
     </header>
     <div class="access-grid">
       <article class="access-card operator-access" aria-labelledby="operator-title">
-        <p class="provider">MICROSOFT ENTRA ID</p>
+        <div class="card-top"><span class="profile-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M8 4h8v3H8zM8 5H5v16h14V5h-3M9 12l2 2 4-4M9 18h6"/></svg></span><p class="provider">MICROSOFT ENTRA ID</p></div>
         <h2 id="operator-title">Operador</h2>
         <p>Revisa y acepta las solicitudes de envío con tu cuenta institucional Duoc.</p>
         <ul><li>Revisar solicitudes y sus datos.</li><li>Confirmar su aceptación.</li><li>Consultar y descargar el ticket.</li></ul>
@@ -20,13 +20,13 @@
           </div>
         } @else {
           <button type="button" class="primary-action" data-testid="operator-sign-in" (click)="useAccess('operator', 'signIn')" [disabled]="busy() || !azure.isConfigured()">Soy operador · Cuenta Duoc</button>
-          <small>Tu cuenta debe estar autorizada en el directorio de Azure del proyecto. No necesitas entrar antes como administrador.</small>
+          <small>Usa tu cuenta Duoc autorizada para el proyecto. No necesitas entrar antes como administrador.</small>
         }
         @if (!azure.isConfigured()) { <p class="configuration">Falta completar la configuración de Azure. Consulta al administrador del proyecto.</p> }
         @if (azure.error()) { <p class="auth-error" role="alert">{{ azure.error() }}</p> }
       </article>
       <article class="access-card admin-access" aria-labelledby="admin-title">
-        <p class="provider">AMAZON COGNITO</p>
+        <div class="card-top"><span class="profile-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 15h7m-7 5h7"/></svg></span><p class="provider">AMAZON COGNITO</p></div>
         <h2 id="admin-title">Administrador</h2>
         <p>Gestiona el catálogo y la operación con tu cuenta administrativa del proyecto.</p>
         <ul><li>Administrar servicios, tarifas y cupos.</li><li>Registrar envíos y actualizar sus estados.</li><li>Consultar reportes y actividad.</li></ul>

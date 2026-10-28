@@ -60,7 +60,7 @@ Compose pasa la misma configuración a BFF, Envíos y Mensajería. Angular obtie
 5. El panel consulta cada tres segundos hasta encontrar un ticket TICKET / shipment.status_changed / ACEPTADO. Un 404 significa que todavía no existe; se reintenta. No se ofrece un comprobante CREADO como confirmación.
 6. Descargar la confirmación y consultar tracking público. El ticket acredita aceptación, no entrega. Los envíos históricos pueden no tener un evento de aceptación de EV2.
 
-El código conserva una revisión local de la bandeja con Cognito Admin, identificada como tal; no acredita login Azure. El Gateway cloud separa authorizers por ruta según el traspaso de Daniel: utilizar Azure para la prueba de operador, sin asumir que Cognito autoriza las rutas del operador en ese Gateway.
+En el frontend actual la bandeja se consulta únicamente con sesión Azure. Una sesión Cognito Admin conserva sus funciones administrativas y muestra la indicación de ingresar con cuenta Duoc, sin intentar consultar las rutas del operador. La revisión administrativa local de versiones anteriores no corresponde al acceso permitido por el Gateway cloud, que separa authorizers por ruta. No se cambian emisores, audiencias, scopes ni validadores para resolver esta diferencia de perfiles.
 
 ## Seguridad y endpoints
 

@@ -2,6 +2,7 @@ import { CommonModule, DecimalPipe } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { KpiReport, ReportApiService, ReportRange, TopDestinationsReport } from '../../core/reports/report-api.service';
+import { mensajeErrorApi } from '../../core/http/errores-api';
 
 @Component({
   selector: 'app-reports-page',
@@ -24,14 +25,15 @@ export class ReportsPageComponent implements OnInit {
     this.selectedRange.set(range);
     this.loading.set(true);
     this.error.set('');
+    this.kpis.set(null); this.destinations.set(null);
     forkJoin({ kpis: this.reports.kpis(range), destinations: this.reports.topDestinations(range) }).subscribe({
       next: ({ kpis, destinations }) => {
         this.kpis.set(kpis);
         this.destinations.set(destinations);
         this.loading.set(false);
       },
-      error: () => {
-        this.error.set('No fue posible cargar los indicadores. Comprueba que reportes y el BFF estén activos, y que tu usuario pertenezca al grupo Admin.');
+      error: error => {
+        this.error.set(mensajeErrorApi(error, 'cargar los reportes'));
         this.loading.set(false);
       },
     });

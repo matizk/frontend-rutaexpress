@@ -1,74 +1,58 @@
-<section class="operator-header">
-  <div><p class="eyebrow">SOLICITUD → REVISIÓN → CONFIRMACIÓN</p><h1>Bandeja del operador</h1>
-    <p>Revisa las solicitudes y confirma su aceptación. El ticket se procesa con RabbitMQ.</p></div>
-  @if (access()) { <button type="button" class="secondary" (click)="reload()" [disabled]="loading()">Actualizar solicitudes</button> }
+<section class="operator-header page-header">
+  <div><p class="eyebrow">ESPACIO DEL OPERADOR</p><h1>Solicitudes de envío</h1><p>Revisa los datos, acepta la solicitud y descarga su confirmación.</p></div>
+  @if (access()) { <button type="button" class="secondary secondary-button" (click)="reload()" [disabled]="loading()"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-2l2 3M4 16l2 3a7 7 0 0 0 12-2"/></svg>{{ loading() ? 'Actualizando…' : 'Actualizar solicitudes' }}</button> }
 </section>
+<ol class="workflow-steps" aria-label="Pasos de la solicitud"><li [class.current]="!selected() || selected()?.estado === 'CREADO'"><span>1</span> Revisa la solicitud</li><li [class.current]="selected()?.estado === 'ACEPTADO'"><span>2</span> Confirma la aceptación</li><li [class.current]="ticket()"><span>3</span> Descarga el ticket</li></ol>
 <section class="identity-card" aria-label="Identidad del operador">
-  <div><h2>Acceso institucional</h2>
-  @if (azure.isAuthenticated()) {
-    <p class="identity">Sesión Microsoft: {{ azure.displayName() }}</p>
-    <small>El backend valida el token de la API y el permiso del operador.</small>
-  } @else if (admin.isAdmin()) {
-    <p class="identity">Revisión con sesión administrativa Cognito</p>
-    <small>Permite probar el flujo, pero no acredita el login institucional Azure de EV2.</small>
-  } @else { <p>Para consultar y aceptar solicitudes, pulsa <strong>Acceder</strong> en el menú y elige <strong>Soy operador · Cuenta Duoc</strong>.</p> }
-  @if (azure.isAuthenticated() || admin.isAdmin()) {
-    <small>Para cambiar de cuenta o cerrar una sesión, gestiona tus accesos desde el menú.</small>
-  }
-  @if (!azure.isConfigured()) {
-    <p class="configuration">Azure pendiente de configuración: faltan tenant y registros frontend/API en <code>azure-config.json</code>. No se simula una sesión institucional.</p>
-  }
-  @if (azure.error()) { <p role="alert" class="error">{{ azure.error() }}</p> }
+  <span class="round-mark" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4 8 9 8 9s8-5 8-9V6l-8-3Z"/><path d="m8 12 3 3 5-6"/></svg></span>
+  <div>
+    @if (azure.isAuthenticated()) {
+      <p class="identity">{{ azure.displayName() }}</p><small>Sesión de operador · Microsoft</small>
+    } @else if (admin.isAdmin()) {
+      <p class="identity">Tienes una sesión de administrador</p><small>Para revisar y aceptar solicitudes necesitas ingresar como operador con tu cuenta Duoc. Tu sesión Cognito no da acceso a esta bandeja.</small>
+    } @else {
+      <p class="identity">Ingresa con tu cuenta Duoc</p><small>Pulsa <strong>Acceder</strong> y elige <strong>Soy operador · Cuenta Duoc</strong> para consultar y aceptar solicitudes.</small>
+    }
+    @if (!azure.isConfigured()) { <p class="configuration">Azure pendiente de configuración. Contacta al administrador del proyecto.</p> }
+    @if (azure.error()) { <p role="alert" class="error">{{ azure.error() }}</p> }
   </div>
+  @if (azure.isAuthenticated()) { <span class="identity-note">Gestiona tu sesión desde Mi acceso</span> }
 </section>
 @if (access()) {
   @if (error()) { <p class="error notice" role="alert">{{ error() }}</p> }
   @if (actionError()) { <p class="error notice" role="alert">{{ actionError() }}</p> }
   @if (notice()) { <p class="success notice" role="status">{{ notice() }}</p> }
   <section class="operator-grid">
-    <div class="card"><div class="card-heading"><h2>Solicitudes registradas</h2>
-      <label>Estado<select [value]="filter()" (change)="changeFilter($any($event.target).value)">
-        <option value="CREADO">Pendientes de aceptación</option><option value="ACEPTADO">Aceptadas</option>
-        <option value="EN_BODEGA">En bodega</option><option value="EN_RUTA">En ruta</option>
-        <option value="ENTREGADO">Entregadas</option><option value="CANCELADO">Canceladas</option>
-      </select></label></div>
-      <p class="muted">Las solicitudes se registran desde Operación. Aquí se revisan y confirman por separado.</p>
-      @if (loading()) { <p role="status">Consultando solicitudes…</p> }
-      @else if (!requests().length) { <p class="empty">No hay solicitudes en este estado.</p> }
+    <div class="card requests-card surface-card">
+      <div class="card-heading"><div><h2>Bandeja de solicitudes</h2>@if (loading()) { <p>Consultando solicitudes…</p> } @else if (error()) { <p>Sin datos disponibles</p> } @else { <p>{{ visibleRequests().length }} {{ visibleRequests().length === 1 ? 'solicitud visible' : 'solicitudes visibles' }}</p> }</div><label>Estado<select [value]="filter()" (change)="changeFilter($any($event.target).value)"><option value="CREADO">Pendientes de aceptación</option><option value="ACEPTADO">Aceptadas</option><option value="EN_BODEGA">En bodega</option><option value="EN_RUTA">En ruta</option><option value="ENTREGADO">Entregadas</option><option value="CANCELADO">Canceladas</option></select></label></div>
+      <label class="request-search">Buscar en este estado<input type="search" placeholder="Código, origen o destino" [value]="search()" (input)="search.set($any($event.target).value)" /></label>
+      @if (loading()) { <p class="empty" role="status">Consultando solicitudes…</p> }
+      @else if (error()) { <div class="empty"><strong>No pudimos cargar tu bandeja</strong><p>Revisa el aviso y vuelve a actualizar. No podemos confirmar si hay solicitudes pendientes.</p></div> }
+      @else if (!visibleRequests().length) { <div class="empty"><strong>{{ search().trim() ? 'No hay resultados para esa búsqueda' : 'Tu bandeja está al día' }}</strong><p>{{ search().trim() ? 'Prueba con otro código, origen o destino.' : 'No hay solicitudes en este estado. Puedes cambiar el filtro o actualizar la bandeja.' }}</p></div> }
       @else {
-        <ul class="request-list">@for (shipment of requests(); track shipment.id) {
-          <li><button class="request" type="button" (click)="open(shipment)" [disabled]="busy()"
-              [class.selected]="selected()?.id === shipment.id" [attr.aria-pressed]="selected()?.id === shipment.id">
-            <strong>{{ shipment.codigoSeguimiento }}</strong><span>{{ shipment.direccionOrigen }} → {{ shipment.direccionDestino }}</span>
-            <small>{{ shipment.estado }} · {{ shipment.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</small>
-          </button></li>
+        <ul class="request-list">@for (shipment of visibleRequests(); track shipment.id) {
+          <li><button class="request" type="button" (click)="open(shipment)" [disabled]="busy()" [class.selected]="selected()?.id === shipment.id" [attr.aria-pressed]="selected()?.id === shipment.id"><span class="request-top"><strong>{{ shipment.codigoSeguimiento }}</strong><span class="status-badge" [attr.data-status]="shipment.estado">{{ statusLabels[shipment.estado] }}</span></span><span class="request-route">{{ shipment.direccionOrigen }} <span aria-hidden="true">→</span> {{ shipment.direccionDestino }}</span><small>{{ shipment.servicioNombre || 'Servicio no informado' }} · {{ shipment.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</small></button></li>
         }</ul>
       }
     </div>
-    <div class="card detail">
+    <div class="card detail surface-card">
       @if (selected(); as shipment) {
-        <p class="eyebrow">REVISIÓN DE LA SOLICITUD</p><h2>{{ shipment.codigoSeguimiento }}</h2>
-        <dl><dt>Destinatario</dt><dd>{{ shipment.nombreDestinatario }}</dd><dt>Correo</dt><dd>{{ shipment.emailDestinatario }}</dd>
-          <dt>Origen</dt><dd>{{ shipment.direccionOrigen }}</dd><dt>Destino</dt><dd>{{ shipment.direccionDestino }}</dd>
-          <dt>Servicio</dt><dd>{{ shipment.servicioNombre || 'No informado' }} · {{ shipment.pesoKg }} kg</dd>
-          <dt>Estado actual</dt><dd>{{ shipment.estado }}</dd></dl>
-        @if (shipment.estado === 'CREADO') {
-          <p>La solicitud está creada, pero todavía no ha sido aceptada.</p>
-          <button type="button" data-testid="accept" (click)="accept()" [disabled]="busy()">{{ busy() ? 'Aceptando…' : 'Aceptar solicitud' }}</button>
-        } @else if (shipment.estado === 'CANCELADO') { <p>Esta solicitud fue cancelada y no puede aceptarse.</p> }
+        <div class="detail-heading"><p class="eyebrow">DETALLE DE LA SOLICITUD</p><span class="status-badge" [attr.data-status]="shipment.estado">{{ statusLabels[shipment.estado] }}</span></div><h2>{{ shipment.codigoSeguimiento }}</h2>
+        <div class="route-summary"><div><span>Origen</span><strong>{{ shipment.direccionOrigen }}</strong></div><span aria-hidden="true">→</span><div><span>Destino</span><strong>{{ shipment.direccionDestino }}</strong></div></div>
+        <dl><dt>Destinatario</dt><dd>{{ shipment.nombreDestinatario }}</dd><dt>Correo</dt><dd>{{ shipment.emailDestinatario }}</dd><dt>Servicio</dt><dd>{{ shipment.servicioNombre || 'No informado' }}</dd><dt>Peso</dt><dd>{{ shipment.pesoKg }} kg</dd></dl>
+        @if (shipment.estado === 'CREADO') { <div class="acceptance"><h3>¿Los datos están correctos?</h3><p>La solicitud todavía no ha sido aceptada. Al confirmarla se generará su ticket.</p><button class="action-button" type="button" data-testid="accept" (click)="accept()" [disabled]="busy()">{{ busy() ? 'Aceptando…' : 'Aceptar solicitud' }}<span aria-hidden="true">→</span></button></div> }
+        @else if (shipment.estado === 'CANCELADO') { <p class="notice error">Esta solicitud fue cancelada y no puede aceptarse.</p> }
         @else {
-          <section class="confirmation" aria-label="Ticket de confirmación">
-            <h3>Confirmación de aceptación</h3>
-            @if (ticket(); as receipt) {
-              <p class="success">Ticket generado y guardado en PostgreSQL.</p>
-              <p>TK-{{ receipt.eventId }}</p><small>{{ receipt.processedAt | date:'dd/MM/yyyy HH:mm:ss' }}</small>
-              <button type="button" (click)="download()">Descargar confirmación</button>
-            } @else if (ticketWaiting()) { <p role="status">Buscando el ticket de aceptación… Se actualiza automáticamente. Los envíos históricos pueden no tener este evento.</p> }
+          <section class="confirmation" aria-label="Ticket de confirmación"><span class="round-mark" aria-hidden="true">✓</span><h3>Confirmación de aceptación</h3>
+            @if (ticket(); as receipt) { <p class="success">Tu confirmación está lista para descargar.</p><p class="ticket-code">TK-{{ receipt.eventId }}</p><small>{{ receipt.processedAt | date:'dd/MM/yyyy HH:mm:ss' }}</small><button class="action-button" type="button" (click)="download()">Descargar confirmación <span aria-hidden="true">↓</span></button> }
+            @else if (ticketWaiting()) { <p role="status">Buscando el ticket de aceptación… Se actualiza automáticamente. Los envíos históricos pueden no tener este evento.</p> }
             @if (ticketError()) { <p class="error" role="alert">{{ ticketError() }}</p> }
             <small>Este ticket confirma la aceptación, no la entrega del envío.</small>
           </section>
         }
-      } @else { <div class="empty"><h2>Selecciona una solicitud</h2><p>Revisa sus datos antes de aceptar. El ticket de creación no equivale a la confirmación del operador.</p></div> }
+      } @else { <div class="empty detail-empty"><span class="empty-symbol" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M8 4h8v3H8zM8 5H5v16h14V5h-3M9 12h6M9 16h4"/></svg></span><h2>Selecciona una solicitud</h2><p>Elige un envío de la bandeja para revisar sus datos y continuar con la aceptación.</p><span class="empty-hint">El detalle aparecerá aquí</span></div> }
     </div>
   </section>
+} @else {
+  <section class="operator-onboarding"><span class="empty-symbol" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M8 4h8v3H8zM8 5H5v16h14V5h-3M9 12l2 2 4-4M9 18h6"/></svg></span><h2>Todo listo para revisar tus solicitudes</h2><p>Inicia tu sesión institucional para ver pendientes, confirmar su aceptación y descargar los tickets.</p><a class="action-button" routerLink="/login">Ir a mis accesos <span aria-hidden="true">→</span></a></section>
 }

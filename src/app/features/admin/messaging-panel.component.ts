@@ -3,6 +3,7 @@ import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angula
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, catchError, forkJoin, switchMap, timer } from 'rxjs';
 import { MessageReceipt, MessagingApiService, MessagingSummary } from '../../core/messaging/messaging-api.service';
+import { mensajeErrorApi } from '../../core/http/errores-api';
 
 @Component({
   selector: 'app-messaging-panel',
@@ -25,8 +26,8 @@ export class MessagingPanelComponent implements OnInit {
   ngOnInit(): void {
     timer(0, 5000).pipe(
       switchMap(() => forkJoin({ summary: this.api.summary(), receipts: this.api.receipts() }).pipe(
-        catchError(() => {
-          this.error.set('No se pudo actualizar la actividad. Comprueba la conexión o vuelve a iniciar sesión.');
+        catchError(error => {
+          this.error.set(mensajeErrorApi(error, 'actualizar la actividad'));
           return EMPTY;
         }),
       )),
