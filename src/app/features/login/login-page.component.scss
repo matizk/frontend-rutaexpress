@@ -1,10 +1,10 @@
 :host { display: block; }
 .login-layout { min-height: calc(100dvh - 10rem); padding: 3rem 1.5rem; background: radial-gradient(ellipse at 50% 0, #e4f2ee, transparent 65%); }
-.access-page { max-width: 850px; margin: auto; }
+.access-page { max-width: 1110px; margin: auto; }
 .access-heading { margin: 0 auto 2rem; text-align: center; }
 h1 { margin: .7rem 0 1rem; font-size: clamp(2rem, 4.5vw, 2.8rem); line-height: 1.15; letter-spacing: -.055em; }
 .access-heading > p:last-child { color: var(--muted); font-size: .88rem; line-height: 1.75; }
-.access-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.3rem; }
+.access-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.3rem; }
 .access-card { display: flex; flex-direction: column; min-width: 0; padding: 2rem; border: 1px solid var(--line); border-radius: 1.05rem; background: white; box-shadow: var(--shadow); }
 .operator-access { border-color: #b5d8cb; }
 .card-top { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: 1.5rem; }
@@ -30,6 +30,9 @@ small { display: block; margin-top: .9rem; color: var(--muted); font-size: .65re
 .access-card .auth-error { margin-top: 1rem; padding: .8rem; border-radius: .55rem; background: #fff1ed; color: #a03b32; font-size: .75rem; }
 .access-card .configuration { margin-top: .8rem; font-size: .7rem; }
 .access-note, .access-status { margin-top: 1.2rem; padding: 1rem; border: 1px solid #ceded7; border-radius: .65rem; background: #edf6f1; color: #416b59; font-size: .76rem; line-height: 1.7; }
+.profile-conflict { margin-bottom: 1.2rem; padding: 1rem; border: 1px solid #efc8be; border-radius: .65rem; background: #fff1ed; color: #a03b32; font-size: .8rem; }
+.profile-conflict .text-action { margin-left: 0; }
 .public-access { margin: 1.8rem auto 0; color: var(--muted); font-size: .73rem; text-align: center; line-height: 1.8; }
 .public-access a { display: block; color: var(--accent); font-weight: 650; text-underline-offset: .25rem; }
 @media (max-width: 650px) { .login-layout { padding: 2.5rem 1.2rem; } .access-grid { grid-template-columns: 1fr; } .access-card { padding: 1.6rem; } .access-heading { text-align: left; } }
+@media (min-width: 651px) and (max-width: 900px) { .access-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
