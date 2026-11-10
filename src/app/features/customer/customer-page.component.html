@@ -1,0 +1,71 @@
+<section class="customer-page" aria-labelledby="customer-title">
+  <header class="customer-heading">
+    <div>
+      <p class="eyebrow">ESPACIO DEL CLIENTE</p>
+      <h1 id="customer-title">Mis pedidos</h1>
+      <p>Solicita un envío y consulta su estado desde tu cuenta.</p>
+    </div>
+    <button type="button" class="secondary-button" (click)="refresh()"
+      [disabled]="loadingOrders() || loadingServices() || creating()">Actualizar</button>
+  </header>
+
+  <div class="customer-grid">
+    <section class="surface-card" aria-labelledby="new-order-title">
+      <h2 id="new-order-title">Nuevo pedido</h2>
+      <form [formGroup]="form" (ngSubmit)="create()">
+        <fieldset [disabled]="creating()">
+          <label>Nombre del destinatario<input type="text" formControlName="nombreDestinatario" required maxlength="120"></label>
+          <label>Correo del destinatario<input type="email" formControlName="emailDestinatario" required maxlength="160"></label>
+          <label>Origen<input type="text" formControlName="direccionOrigen" required maxlength="250"></label>
+          <label>Destino<input type="text" formControlName="direccionDestino" required maxlength="250"></label>
+          <label>Peso en kilogramos<input type="number" formControlName="pesoKg" required min="0.01" step="0.01"></label>
+          <label>Servicio
+            <select formControlName="servicioId" required>
+              <option [ngValue]="0" disabled>Selecciona un servicio</option>
+              @for (service of availableServices(); track service.id) {
+                <option [ngValue]="service.id">{{ service.nombre }} · {{ service.precio | currency:'CLP':'symbol':'1.0-0' }}</option>
+              }
+            </select>
+          </label>
+        </fieldset>
+        @if (loadingServices()) {
+          <p role="status">Cargando servicios disponibles…</p>
+        } @else if (catalogError()) {
+          <p class="notice" role="alert">{{ catalogError() }}</p>
+        } @else if (!availableServices().length) {
+          <p>Por ahora no hay servicios con cupos disponibles.</p>
+        }
+        @if (submissionError()) { <p class="notice" role="alert">{{ submissionError() }}</p> }
+        @if (confirmation()) { <p class="confirmation" role="status">{{ confirmation() }}</p> }
+        <button class="action-button" type="submit"
+          [disabled]="creating() || loadingOrders() || loadingServices() || !availableServices().length">
+          {{ creating() ? 'Creando pedido…' : 'Crear pedido' }}
+        </button>
+      </form>
+    </section>
+
+    <section class="surface-card" aria-labelledby="customer-history-title">
+      <h2 id="customer-history-title">Historial de pedidos</h2>
+      @if (loadingOrders()) {
+        <p role="status">Cargando tus pedidos…</p>
+      }
+      @if (orderError()) {
+        <p class="notice" role="alert">{{ orderError() }}</p>
+      }
+      @if (!loadingOrders() && !orderError() && !orders().length) {
+        <p>Tus pedidos aparecerán aquí cuando crees una solicitud.</p>
+      }
+      @if (orders().length) {
+        <ul class="order-list">
+          @for (order of orders(); track order.id) {
+            <li>
+              <div class="order-title"><strong>{{ order.codigoSeguimiento }}</strong><span>{{ order.estado.replaceAll('_', ' ') }}</span></div>
+              <p>{{ order.direccionOrigen }} → {{ order.direccionDestino }}</p>
+              <small>{{ order.servicioNombre }} · {{ order.fechaActualizacion | date:'dd/MM/yyyy HH:mm' }}</small>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+</section>

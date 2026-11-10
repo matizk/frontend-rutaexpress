@@ -28,10 +28,10 @@ function setup() {
 }
 
 describe('Seguimiento público', () => {
-  it('normaliza el código y distingue aceptación de entrega en el resultado real', () => {
+  it('quita espacios del código y distingue aceptación de entrega en el resultado real', () => {
     const { api, root, submit } = setup();
     submit('  rx-prueba  ');
-    expect(api.track).toHaveBeenCalledWith('RX-PRUEBA');
+    expect(api.track).toHaveBeenCalledWith('rx-prueba');
     const result = root.querySelector('.tracking-result')!;
     expect(result.textContent).toContain('Valparaíso');
     expect(result.textContent).toContain('La entrega del envío es una etapa posterior');

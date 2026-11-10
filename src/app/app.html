@@ -5,25 +5,32 @@
     <span class="brand-name">Ruta<span>Express</span><small>Gestión de envíos</small></span>
   </a>
   <nav aria-label="Navegación principal">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Inicio</a>
-    <a routerLink="/" fragment="tracking">Seguimiento</a>
-    <a routerLink="/operador" routerLinkActive="active" ariaCurrentWhenActive="page">Solicitudes</a>
-    @if (session.isAuthenticated() && session.isAdmin()) {
-      <a routerLink="/admin" routerLinkActive="active" ariaCurrentWhenActive="page">Envíos</a>
-      <a routerLink="/catalogo" routerLinkActive="active" ariaCurrentWhenActive="page">Servicios</a>
-      <a routerLink="/reportes" routerLinkActive="active" ariaCurrentWhenActive="page">Reportes</a>
+    @switch (profile()?.workspace) {
+      @case ('admin') {
+        <a routerLink="/admin" routerLinkActive="active" ariaCurrentWhenActive="page">Envíos</a>
+        <a routerLink="/catalogo" routerLinkActive="active" ariaCurrentWhenActive="page">Servicios</a>
+        <a routerLink="/reportes" routerLinkActive="active" ariaCurrentWhenActive="page">Reportes</a>
+      }
+      @case ('operator') {
+        <a routerLink="/operador" routerLinkActive="active" ariaCurrentWhenActive="page">Solicitudes</a>
+      }
+      @case ('customer') {
+        <a routerLink="/cliente" routerLinkActive="active" ariaCurrentWhenActive="page">Mis pedidos</a>
+        <a routerLink="/" fragment="tracking">Seguimiento</a>
+      }
+      @default {
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Inicio</a>
+        <a routerLink="/" fragment="tracking">Seguimiento</a>
+      }
     }
   </nav>
   <div class="access-summary">
-    @if (azure.isAuthenticated()) {
-      <span class="session-label"><strong>Operador · Microsoft</strong><span [title]="azure.displayName()">{{ azure.displayName() }}</span></span>
-    }
-    @if (session.isAuthenticated()) {
-      <span class="session-label"><strong>{{ session.isAdmin() ? 'Administrador · Cognito' : 'Cognito · Sin permiso Admin' }}</strong><span [title]="session.displayName()">{{ session.displayName() }}</span></span>
+    @if (profile(); as current) {
+      <span class="session-label"><strong>{{ current.label }}</strong><span [title]="current.name">{{ current.name }}</span></span>
     }
     <a class="login-link" routerLink="/login">
       <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg>
-      {{ azure.isAuthenticated() && session.isAuthenticated() ? 'Mis accesos' : azure.isAuthenticated() || session.isAuthenticated() ? 'Mi acceso' : 'Acceder' }}
+      {{ accessLabel() }}
     </a>
   </div>
 </header>

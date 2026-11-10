@@ -1,11 +1,40 @@
 <section class="login-layout" aria-labelledby="access-title">
   <div class="access-page">
     <header class="access-heading">
-      <p class="eyebrow">TU ESPACIO DE TRABAJO</p>
-      <h1 id="access-title">¿Cómo quieres trabajar?</h1>
+      <p class="eyebrow">ACCESOS RUTAEXPRESS</p>
+      <h1 id="access-title">¿Cómo quieres entrar?</h1>
       <p>Elige tu perfil. Te llevamos a las herramientas que necesitas.</p>
     </header>
+    @if (session.profileConflict(); as profile) {
+      <div class="profile-conflict">
+        <p role="alert">
+          @if (profile === 'customer') {
+            Cognito abrió una cuenta de administrador. En la tarjeta Cliente puedes entrar con tu correo de cliente o crear una cuenta.
+          } @else {
+            Cognito abrió una cuenta de cliente. Para entrar a administración, usa una cuenta autorizada del grupo Admin.
+          }
+        </p>
+        <button type="button" class="text-action" data-testid="cognito-switch-account" (click)="useAccess(profile, 'signOut')" [disabled]="busy()">Cerrar sesión de Cognito</button>
+      </div>
+    }
     <div class="access-grid">
+      <article class="access-card customer-access" aria-labelledby="customer-title">
+        <div class="card-top"><span class="profile-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3ZM4 7.5l8 4.5 8-4.5M12 12v9"/></svg></span><p class="provider">AMAZON COGNITO</p></div>
+        <h2 id="customer-title">Cliente</h2>
+        <p>Solicita un envío y consulta su avance desde tu cuenta.</p>
+        <ul><li>Crear una cuenta de cliente.</li><li>Hacer un pedido de envío.</li><li>Consultar tus pedidos y sus estados.</li></ul>
+        @if (session.isAuthenticated() && !session.isAdmin()) {
+          <div class="session-info"><span>Sesión de cliente</span><strong>{{ session.displayName() }}</strong></div>
+          <a class="primary-action" routerLink="/cliente">Ir a mis pedidos</a>
+          <button type="button" class="text-action" data-testid="customer-sign-out" (click)="useAccess('customer', 'signOut')" [disabled]="busy()">Cerrar sesión de cliente</button>
+        } @else if (!session.isAuthenticated()) {
+          <button type="button" class="primary-action" data-testid="customer-sign-in" (click)="useAccess('customer', 'signIn')" [disabled]="busy() || !session.isConfigured()">Ingresar como cliente</button>
+          <button type="button" class="text-action" data-testid="customer-sign-up" (click)="registerCustomer()" [disabled]="busy() || !session.isConfigured()">Crear cuenta de cliente</button>
+          <small>Usa un correo distinto al de la cuenta de administrador.</small>
+        } @else {
+          <small>Para pedir un envío como cliente, cierra tu sesión de administrador y entra con tu cuenta de cliente.</small>
+        }
+      </article>
       <article class="access-card operator-access" aria-labelledby="operator-title">
         <div class="card-top"><span class="profile-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M8 4h8v3H8zM8 5H5v16h14V5h-3M9 12l2 2 4-4M9 18h6"/></svg></span><p class="provider">MICROSOFT ENTRA ID</p></div>
         <h2 id="operator-title">Operador</h2>
@@ -30,22 +59,23 @@
         <h2 id="admin-title">Administrador</h2>
         <p>Gestiona el catálogo y la operación con tu cuenta administrativa del proyecto.</p>
         <ul><li>Administrar servicios, tarifas y cupos.</li><li>Registrar envíos y actualizar sus estados.</li><li>Consultar reportes y actividad.</li></ul>
-        @if (session.isAuthenticated()) {
-          <div class="session-info"><span>Sesión de Cognito</span><strong>{{ session.displayName() }}</strong></div>
-          @if (session.isAdmin()) { <a class="primary-action" routerLink="/admin">Ir a operación</a> }
-          @else { <p class="auth-error" role="alert">Esta cuenta no pertenece al grupo Admin y no tiene acceso administrativo.</p> }
-          <button type="button" class="text-action" data-testid="admin-sign-out" (click)="useAccess('admin', 'signOut')" [disabled]="busy()">Cerrar sesión de Cognito</button>
+        @if (session.isAuthenticated() && session.isAdmin()) {
+          <div class="session-info"><span>Sesión de administrador</span><strong>{{ session.displayName() }}</strong></div>
+          <a class="primary-action" routerLink="/admin">Ir a operación</a>
+          <button type="button" class="text-action" data-testid="admin-sign-out" (click)="useAccess('admin', 'signOut')" [disabled]="busy()">Cerrar sesión de administrador</button>
+        } @else if (!session.isAuthenticated()) {
+          <button type="button" class="primary-action" data-testid="admin-sign-in" (click)="useAccess('admin', 'signIn')" [disabled]="busy() || !!session.profileConflict() || !session.isConfigured()">Soy administrador · Cognito</button>
+          <small>Usa tu cuenta autorizada del grupo Admin.</small>
         } @else {
-          <button type="button" class="primary-action" data-testid="admin-sign-in" (click)="useAccess('admin', 'signIn')" [disabled]="busy() || !session.isConfigured()">Soy administrador · Cognito</button>
-          <small>Este acceso no inicia una sesión de operador en Microsoft.</small>
+          <small>Para ingresar a administración, cambia a una cuenta del grupo Admin en Cognito.</small>
         }
         @if (!session.isConfigured()) { <p class="configuration">Falta completar la configuración de Cognito. Consulta al administrador del proyecto.</p> }
-        @if (session.error()) { <p class="auth-error" role="alert">{{ session.error() }}</p> }
       </article>
     </div>
+    @if (session.error()) { <p class="access-status" role="alert">{{ session.error() }}</p> }
     @if (busy()) { <p class="access-status" role="status">Abriendo el acceso seleccionado…</p> }
     @if (azure.isAuthenticated() && session.isAuthenticated()) {
-      <p class="access-note">Tienes dos sesiones abiertas. Cerrar una no cierra la otra: utiliza el botón del perfil que corresponda.</p>
+      <p class="access-note">Tienes dos sesiones abiertas. Elige el enlace del perfil que quieras usar. Cada sesión tiene su propio botón para cerrarla.</p>
     }
     <p class="public-access">¿Solo necesitas consultar un envío? <a routerLink="/" fragment="tracking">El seguimiento es público y no requiere iniciar sesión.</a></p>
   </div>

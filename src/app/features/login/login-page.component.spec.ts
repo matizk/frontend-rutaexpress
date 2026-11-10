@@ -2,14 +2,16 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { describe, expect, it, vi } from 'vitest';
-import { AuthSessionService } from '../../core/auth/auth-session.service';
+import { AuthSessionService, type CognitoProfile } from '../../core/auth/auth-session.service';
 import { AzureSessionService } from '../../core/auth/azure-session.service';
 import { LoginPageComponent } from './login-page.component';
 
 function setup(configured = true) {
   const admin = { isAuthenticated: signal(false), isAdmin: signal(true),
     displayName: signal('Administración de prueba'), isConfigured: () => configured, error: signal(''),
-    signIn: vi.fn().mockResolvedValue(undefined), signOut: vi.fn().mockResolvedValue(undefined) };
+    profileConflict: signal<CognitoProfile | null>(null),
+    signIn: vi.fn().mockResolvedValue(undefined), signOut: vi.fn().mockResolvedValue(undefined),
+    registerCustomer: vi.fn().mockResolvedValue(undefined) };
   const operator = { isAuthenticated: signal(false), displayName: signal('Operador de prueba'),
     isConfigured: () => configured, error: signal(''),
     signIn: vi.fn().mockResolvedValue(undefined), signOut: vi.fn().mockResolvedValue(undefined) };
@@ -23,11 +25,13 @@ function setup(configured = true) {
 }
 
 describe('Acceso centralizado por perfil', () => {
-  it('explica los dos perfiles y ofrece seguimiento público sin autenticación', () => {
+  it('explica los tres perfiles y ofrece seguimiento público sin autenticación', () => {
     const { root } = setup();
     expect(root.textContent).toContain('Soy operador · Cuenta Duoc');
     expect(root.textContent).toContain('Soy administrador · Cognito');
-    expect(root.querySelectorAll('button')).toHaveLength(2);
+    expect(root.textContent).toContain('Ingresar como cliente');
+    expect(root.textContent).toContain('Crear cuenta de cliente');
+    expect(root.querySelectorAll('button')).toHaveLength(4);
     expect(root.querySelector('.public-access a')?.getAttribute('href')).toBe('/#tracking');
   });
 
@@ -41,7 +45,27 @@ describe('Acceso centralizado por perfil', () => {
   it('envía el acceso administrativo solamente a Cognito', async () => {
     const { fixture, operator, admin, button } = setup();
     button('admin-sign-in').click(); await fixture.whenStable();
-    expect(admin.signIn).toHaveBeenCalledTimes(1);
+    expect(admin.signIn).toHaveBeenCalledExactlyOnceWith('admin');
+    expect(operator.signIn).not.toHaveBeenCalled();
+  });
+
+  it('abre Cognito indicando que se eligió el acceso de cliente', async () => {
+    const { fixture, admin, button } = setup();
+    button('customer-sign-in').click(); await fixture.whenStable();
+    expect(admin.signIn).toHaveBeenCalledExactlyOnceWith('customer');
+  });
+
+  it('permite crear una cuenta de cliente directamente desde el aviso de cuenta incorrecta', async () => {
+    const { fixture, root, admin, operator, button } = setup();
+    admin.profileConflict.set('customer'); fixture.detectChanges();
+    expect(root.querySelector('[role="alert"]')?.textContent).toContain('Cognito abrió una cuenta de administrador');
+    expect(button('customer-sign-in').disabled).toBe(false);
+    expect(button('customer-sign-up').disabled).toBe(false);
+    expect(button('admin-sign-in').disabled).toBe(true);
+    expect(button('operator-sign-in').disabled).toBe(false);
+    button('customer-sign-up').click(); await fixture.whenStable();
+    expect(admin.registerCustomer).toHaveBeenCalledTimes(1);
+    expect(admin.signOut).not.toHaveBeenCalled();
     expect(operator.signIn).not.toHaveBeenCalled();
   });
 
@@ -66,10 +90,11 @@ describe('Acceso centralizado por perfil', () => {
     expect(operator.signOut).not.toHaveBeenCalled();
   });
 
-  it('no ofrece operación administrativa a una cuenta Cognito sin grupo Admin', () => {
+  it('ofrece sus pedidos a una cuenta de cliente', () => {
     const { fixture, root, admin } = setup();
     admin.isAuthenticated.set(true); admin.isAdmin.set(false); fixture.detectChanges();
-    expect(root.textContent).toContain('no pertenece al grupo Admin');
+    expect(root.textContent).toContain('Sesión de cliente');
+    expect(root.querySelector('a[href="/cliente"]')).not.toBeNull();
     expect(root.querySelector('a[href="/admin"]')).toBeNull();
   });
 
@@ -77,6 +102,7 @@ describe('Acceso centralizado por perfil', () => {
     const { root, button } = setup(false);
     expect(button('operator-sign-in').disabled).toBe(true);
     expect(button('admin-sign-in').disabled).toBe(true);
+    expect(button('customer-sign-up').disabled).toBe(true);
     expect(root.textContent).toContain('Falta completar la configuración de Azure');
     expect(root.textContent).toContain('Falta completar la configuración de Cognito');
   });

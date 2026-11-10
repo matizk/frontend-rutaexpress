@@ -6,6 +6,27 @@ import { ReportApiService } from '../../core/reports/report-api.service';
 import { ReportsPageComponent } from './reports-page.component';
 
 describe('Disponibilidad de los reportes', () => {
+  it('muestra el dashboard configurado dentro de Reportes', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ grafanaBaseUrl: 'http://localhost:3000/' }),
+    }));
+    try {
+      const api = { kpis: () => of(null), topDestinations: () => of({ destinations: [] }) };
+      TestBed.configureTestingModule({ imports: [ReportsPageComponent], providers: [{ provide: ReportApiService, useValue: api }] });
+      const fixture = TestBed.createComponent(ReportsPageComponent);
+      fixture.detectChanges();
+      await vi.waitFor(() => {
+        fixture.detectChanges();
+        const frame = fixture.nativeElement.querySelector('iframe') as HTMLIFrameElement | null;
+        expect(frame?.src).toBe('http://localhost:3000/d/rutaexpress-ev3/rutaexpress-ev3?kiosk=true');
+      });
+      fixture.destroy();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('retira los indicadores de otro periodo si falla la carga y permite reintentar', () => {
     const report = { range: 'last7d', from: '', to: '', totalShipments: 12, activeShipments: 4,
       deliveredShipments: 8, cancelledShipments: 0, averageDeliveredLeadTimeHours: 2, shipmentsByStatus: {} };
