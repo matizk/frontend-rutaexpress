@@ -1,17 +1,12 @@
 import { Amplify, type ResourcesConfig } from 'aws-amplify';
 import { cognitoUserPoolsTokenProvider } from 'aws-amplify/auth/cognito';
 import { sessionStorage } from 'aws-amplify/utils';
+import settings from './cognito-settings.json';
 
 const PENDING: string = 'REPLACE_ME';
 
 /** Identificadores públicos de Cognito. Una SPA nunca debe tener client secret. */
-export const cognitoConfig = {
-  userPoolId: 'us-east-1_uLyDkRP8y',
-  userPoolClientId: '7f6d81dggegrjlibqhavj2q0ti',
-  domain: 'rutaexpress-ev2-admin-529597838153.auth.us-east-1.amazoncognito.com',
-  redirectSignIn: 'http://localhost:4200/',
-  redirectSignOut: 'http://localhost:4200/',
-} as const;
+export const cognitoConfig = settings;
 
 export const isCognitoConfigured = (): boolean =>
   [cognitoConfig.userPoolId, cognitoConfig.userPoolClientId, cognitoConfig.domain]

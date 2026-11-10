@@ -1,0 +1,7 @@
+{
+  "userPoolId": "us-east-1_uLyDkRP8y",
+  "userPoolClientId": "7f6d81dggegrjlibqhavj2q0ti",
+  "domain": "rutaexpress-ev2-admin-529597838153.auth.us-east-1.amazoncognito.com",
+  "redirectSignIn": "http://localhost:4200/",
+  "redirectSignOut": "http://localhost:4200/"
+}

@@ -24,4 +24,13 @@
       </article>
     </div>
   }
+  @if (grafanaDashboard(); as grafana) {
+    <section class="panel grafana-panel">
+      <div class="panel-heading">
+        <div><h2>Panel de Grafana</h2><p>Monitoreo de los envíos y del procesamiento de eventos.</p></div>
+        <a class="secondary-button" [href]="grafana.href" target="_blank" rel="noopener noreferrer">Abrir Grafana</a>
+      </div>
+      <iframe [src]="grafana.frame" title="Panel de monitoreo de RutaExpress" loading="lazy" referrerpolicy="no-referrer"></iframe>
+    </section>
+  }
 </section>

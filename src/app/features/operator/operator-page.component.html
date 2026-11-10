@@ -16,7 +16,7 @@
     @if (!azure.isConfigured()) { <p class="configuration">Azure pendiente de configuración. Contacta al administrador del proyecto.</p> }
     @if (azure.error()) { <p role="alert" class="error">{{ azure.error() }}</p> }
   </div>
-  @if (azure.isAuthenticated()) { <span class="identity-note">Gestiona tu sesión desde Mi acceso</span> }
+  @if (azure.isAuthenticated()) { <span class="identity-note">Gestiona tu sesión desde el menú superior</span> }
 </section>
 @if (access()) {
   @if (error()) { <p class="error notice" role="alert">{{ error() }}</p> }

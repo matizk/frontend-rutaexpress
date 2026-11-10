@@ -1,13 +1,15 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
-export function mensajeErrorApi(error: unknown, accion: string, perfil: 'admin' | 'operador' = 'admin'): string {
+export function mensajeErrorApi(error: unknown, accion: string, perfil: 'admin' | 'operador' | 'cliente' = 'admin'): string {
   if (!(error instanceof HttpErrorResponse)) return `No pudimos ${accion}. Inténtalo nuevamente.`;
   if (error.status === 401) {
+    if (perfil === 'cliente') return 'Tu sesión de cliente venció. Vuelve a ingresar con Cognito.';
     return perfil === 'operador'
       ? 'Tu sesión de operador venció o no es válida. Vuelve a ingresar con tu cuenta Duoc.'
       : 'Tu sesión de administrador venció o no es válida. Vuelve a iniciar sesión con Cognito.';
   }
   if (error.status === 403) {
+    if (perfil === 'cliente') return 'Esta acción requiere una cuenta de cliente.';
     return perfil === 'operador'
       ? 'Tu cuenta no tiene permiso para esta acción. Necesitas acceso de operador.'
       : 'Tu cuenta no tiene permiso para esta acción. Necesitas acceso de administrador.';

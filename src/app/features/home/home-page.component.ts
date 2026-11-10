@@ -16,7 +16,7 @@ export class HomePageComponent {
   constructor(private readonly shipmentApi: ShipmentApiService) {}
   protected search(): void {
     if (this.trackingLoading()) return;
-    const code = this.trackingCode().trim().toUpperCase();
+    const code = this.trackingCode().trim();
     this.trackingCode.set(code);
     this.trackingResult.set(null);
     this.trackingError.set('');
